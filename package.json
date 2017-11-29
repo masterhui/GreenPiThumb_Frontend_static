@@ -1,9 +1,9 @@
 {
   "name": "greenpithumb-frontend-static",
-  "homepage": "https://github.com/JeetShetty/GreenPiThumb",
+  "homepage": "https://github.com/masterhui/GreenPiThumb",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JeetShetty/GreenPiThumb_Frontend_static"
+    "url": "https://github.com/masterhui/GreenPiThumb_Frontend_static"
   },
   "license": "Apache-2.0",
   "dependencies": {
