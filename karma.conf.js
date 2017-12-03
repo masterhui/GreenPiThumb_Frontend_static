@@ -20,6 +20,12 @@ module.exports = function(config) {
 
     exclude: [
     ],
+    
+    plugins: [
+      'karma-jasmine',
+      'karma-coverage',
+      'karma-chrome-launcher',
+    ],
 
     preprocessors: {
       'app.js': ['coverage'],

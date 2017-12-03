@@ -14,7 +14,7 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
     // Convert temperature records from C to F.
     temperatureHistory.forEach(function(record) {
       $scope.temperature.push({
-        temperature: (record.temperature * (9.0 / 5.0)) + 32.0,
+        temperature: record.temperature   //(record.temperature * (9.0 / 5.0)) + 32.0,
         timestamp: record.timestamp
       });
     });
@@ -37,7 +37,7 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
     $scope.soilMoisture = [];
     moistureHistory.forEach(function(record) {
       $scope.soilMoisture.push({
-        moisture: (record.soil_moisture / 1023.0) * 100.0,
+        moisture: record.soil_moisture   //(record.soil_moisture / 1023.0) * 100.0,
         timestamp: record.timestamp
       });
     });
