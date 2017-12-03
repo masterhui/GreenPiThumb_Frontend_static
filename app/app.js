@@ -9,18 +9,10 @@ angular.module('d3', []);
 angular.module('greenPiThumbApp.directives', ['d3']);
 
 greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
-  $http.get('/temperatureHistory.json').success(function(temperatureHistory) {
-    $scope.temperature = [];
-    // Convert temperature records from C to F.
-    temperatureHistory.forEach(function(record) {
-      $scope.temperature.push({
-        temperature: record.temperature   //(record.temperature * (9.0 / 5.0)) + 32.0,
-        timestamp: record.timestamp
-      });
-    });
-
+  $http.get('/temperatureHistory.json').success(function(temperatureHistory) {    
+	$scope.temperature = temperatureHistory
     $scope.latestTemperature =
-      $scope.temperature[$scope.temperature.length - 1].temperature;
+      temperatureHistory[temperatureHistory.length - 1].temperature;
   });
   $http.get('/humidityHistory.json').success(function(humidityHistory) {
     $scope.humidity = humidityHistory;
@@ -37,7 +29,7 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
     $scope.soilMoisture = [];
     moistureHistory.forEach(function(record) {
       $scope.soilMoisture.push({
-        moisture: record.soil_moisture   //(record.soil_moisture / 1023.0) * 100.0,
+        moisture: record.soil_moisture,
         timestamp: record.timestamp
       });
     });
