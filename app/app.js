@@ -25,7 +25,6 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
       lightHistory[lightHistory.length - 1].light;
   });
   $http.get('/soilMoistureHistory.json').success(function(moistureHistory) {
-    // Convert raw soil moisture readings into a percentage (out of 1023).
     $scope.soilMoisture = [];
     moistureHistory.forEach(function(record) {
       $scope.soilMoisture.push({
@@ -36,6 +35,11 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
     $scope.latestSoilMoisture =
       $scope.soilMoisture[$scope.soilMoisture.length - 1].moisture;
   });
+  $http.get('/wateringEventHistory.json').success(function(wateringEventHistory) {
+    $scope.waterPumped = wateringEventHistory;
+    $scope.latestPumpEvent =
+      wateringEventHistory[wateringEventHistory.length - 1].water_pumped;
+  });	
   $http.get('/images.json').success(function(images) {
     $scope.images = [];
     images.forEach(function(image) {
