@@ -40,22 +40,27 @@
       <table class="table table-hover">
         <tr>
           <td>Ambient Temperature</td>
-          <td>{{ latestTemperature | number:1 }} &deg;C</td>
+          <td>{{ temperatureTimestamp }}</td>
+          <td>{{ latestTemperature | number:1 }}</td>
         </tr>
         <tr>
           <td>Ambient Humidity</td>
+          <td>{{ humidityTimestamp }}</td>
           <td>{{ latestHumidity | number:1 }} %</td>
         </tr>
         <tr>
           <td>Ambient Light</td>
+          <td>{{ lightLevelTimestamp }}</td>
           <td>{{ latestLightLevel | number:1 }} %</td>
         </tr>
         <tr>
           <td>Soil Moisture</td>
+          <td>{{ soilMoistureTimestamp }}</td>
           <td>{{ latestSoilMoisture | number:1 }} %</td>
         </tr>
         <tr>
           <td>Water PumpEvents</td>
+          <td>{{ pumpEventTimestamp }}</td>
           <td>{{ latestPumpEvent | number:1 }} %</td>
         </tr>        
       </table>
