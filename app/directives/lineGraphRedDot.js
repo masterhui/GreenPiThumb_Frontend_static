@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('greenPiThumbApp.directives')
-  .directive('lineGraph', ['d3Service', function(d3Service) {
+  .directive('lineGraphRedDot', ['d3Service', function(d3Service) {
     return {
       restrict: 'E',
       replace: false,
@@ -63,15 +63,17 @@ angular.module('greenPiThumbApp.directives')
             ]);
 
             // Add the valueline path.
-            svg.append('path')
-              .attr('class', 'line')
-              .attr('d', valueline(data));
+            //~ svg.append('path')
+              //~ .attr('class', 'line')
+              //~ .style("stroke", "red")
+              //~ .attr('d', valueline(data));
               
             // Add the scatterplot for tooltips.
             svg.selectAll('dot')
               .data(data)
             .enter().append('circle')
-              .attr('r', 2.5)
+              .attr('r', 6)
+              .attr('fill', 'red' )
               .attr('cx', function(d) { return x(d.timestamp); })
               .attr('cy', function(d) { return y(d.value); })
               .on('mouseover', function(d) {

@@ -123,7 +123,7 @@
       <h3>Soil Moisture</h3>
       <line-graph chart-data="soilMoisture" value-property="moisture"></line-graph>
       <h3>Watering Events</h3>
-      <line-graph chart-data="waterPumped" value-property="water_pumped"></line-graph>      
+      <line-graph-red-dot chart-data="waterPumped" value-property="water_pumped"></line-graph-red-dot>      
     </div>
     <div class="row" id="about">
       <h1>About</h1>
@@ -135,6 +135,7 @@
   <script src="app.js"></script>
   <script src="services/d3.js"></script>
   <script src="directives/lineGraph.js"></script>
+  <script src="directives/lineGraphRedDot.js"></script>
   <script src="components/version/version.js"></script>
   <script src="components/version/version-directive.js"></script>
   <script src="components/version/interpolate-filter.js"></script>
