@@ -39,17 +39,17 @@
       <h1>Current Readings</h1>
       <table class="table table-hover">
         <tr>
-          <td>Ambient Temperature</td>
+          <td>Temperature</td>
           <td>{{ temperatureTimestamp }}</td>
           <td>{{ latestTemperature | number:1 }} °C</td>
         </tr>
         <tr>
-          <td>Ambient Humidity</td>
+          <td>Humidity</td>
           <td>{{ humidityTimestamp }}</td>
           <td>{{ latestHumidity | number:1 }} %</td>
         </tr>
         <tr>
-          <td>Ambient Light</td>
+          <td>Light</td>
           <td>{{ lightLevelTimestamp }}</td>
           <td>{{ latestLightLevel | number:1 }} %</td>
         </tr>
@@ -103,9 +103,9 @@
       <h1>History</h1>
       <h3>Temperature</h3>
       <line-graph chart-data="temperature" value-property="temperature"></line-graph>
-      <h3>Ambient Humidity</h3>
+      <h3>Humidity</h3>
       <line-graph chart-data="humidity" value-property="humidity"></line-graph>
-      <h3>Ambient Light</h3>
+      <h3>Light</h3>
       <line-graph chart-data="lightLevel" value-property="light"></line-graph>
       <h3>Soil Moisture</h3>
       <line-graph chart-data="soilMoisture" value-property="moisture"></line-graph>
