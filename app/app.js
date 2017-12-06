@@ -40,19 +40,21 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
     $scope.soilMoistureTimestamp = $scope.soilMoisture[$scope.soilMoisture.length - 1].timestamp;	  
   });
   $http.get('/wateringEventHistory.json').success(function(wateringEventHistory) {
-    $scope.waterPumped = wateringEventHistory;
-    $scope.waterRecords = wateringEventHistory.length;
+    $scope.waterPumped = wateringEventHistory;    
     if (wateringEventHistory.length >= 1) {
         $scope.latestPumpEvent1 = wateringEventHistory[wateringEventHistory.length - 1].water_pumped;
         $scope.pumpEventTimestamp1 = wateringEventHistory[wateringEventHistory.length - 1].timestamp;
+        $scope.waterRecords1 = wateringEventHistory.length;
     }
     if (wateringEventHistory.length >= 2) {
         $scope.latestPumpEvent2 = wateringEventHistory[wateringEventHistory.length - 2].water_pumped;
         $scope.pumpEventTimestamp2 = wateringEventHistory[wateringEventHistory.length - 2].timestamp;
+        $scope.waterRecords2 = wateringEventHistory.length - 1;
     }
     if (wateringEventHistory.length >= 3) {
         $scope.latestPumpEvent3 = wateringEventHistory[wateringEventHistory.length - 3].water_pumped;
         $scope.pumpEventTimestamp3 = wateringEventHistory[wateringEventHistory.length - 3].timestamp;
+        $scope.waterRecords3 = wateringEventHistory.length - 2;
     }
   });	
   $http.get('/images.json').success(function(images) {
