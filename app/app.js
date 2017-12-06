@@ -45,13 +45,18 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
   });
   $http.get('/wateringEventHistory.json').success(function(wateringEventHistory) {
     $scope.waterPumped = wateringEventHistory;
-    $scope.latestPumpEvent1 = wateringEventHistory[wateringEventHistory.length - 1].water_pumped;
-    $scope.latestPumpEvent2 = wateringEventHistory[wateringEventHistory.length - 2].water_pumped;
-    $scope.latestPumpEvent3 = wateringEventHistory[wateringEventHistory.length - 3].water_pumped;
-    $scope.pumpEventTimestamp1 = wateringEventHistory[wateringEventHistory.length - 1].timestamp;
-    $scope.pumpEventTimestamp2 = wateringEventHistory[wateringEventHistory.length - 2].timestamp;
-    $scope.pumpEventTimestamp3 = wateringEventHistory[wateringEventHistory.length - 3].timestamp;
-
+    if (wateringEventHistory.length >= 1) {
+        $scope.latestPumpEvent1 = wateringEventHistory[wateringEventHistory.length - 1].water_pumped;
+        $scope.pumpEventTimestamp1 = wateringEventHistory[wateringEventHistory.length - 1].timestamp;
+    }
+    if (wateringEventHistory.length >= 2) {
+        $scope.latestPumpEvent2 = wateringEventHistory[wateringEventHistory.length - 2].water_pumped;
+        $scope.pumpEventTimestamp2 = wateringEventHistory[wateringEventHistory.length - 2].timestamp;
+    }
+    if (wateringEventHistory.length >= 3) {
+        $scope.latestPumpEvent3 = wateringEventHistory[wateringEventHistory.length - 3].water_pumped;
+        $scope.pumpEventTimestamp3 = wateringEventHistory[wateringEventHistory.length - 3].timestamp;
+    }
   });	
   $http.get('/images.json').success(function(images) {
     $scope.images = [];
