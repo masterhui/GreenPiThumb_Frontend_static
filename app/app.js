@@ -10,41 +10,38 @@ angular.module('greenPiThumbApp.directives', ['d3']);
 
 greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
   $http.get('/temperatureHistory.json').success(function(temperatureHistory) {    
-	$scope.temperature = temperatureHistory
-    $scope.latestTemperature =
-      temperatureHistory[temperatureHistory.length - 1].temperature;
-    $scope.temperatureTimestamp =
-      temperatureHistory[temperatureHistory.length - 1].timestamp;
+    $scope.temperature = temperatureHistory
+    $scope.temperatureRecords = temperatureHistory.length;
+    $scope.latestTemperature = temperatureHistory[temperatureHistory.length - 1].temperature;
+    $scope.temperatureTimestamp = temperatureHistory[temperatureHistory.length - 1].timestamp;
   });
   $http.get('/humidityHistory.json').success(function(humidityHistory) {
     $scope.humidity = humidityHistory;
-    $scope.latestHumidity =
-      humidityHistory[humidityHistory.length - 1].humidity;
-    $scope.humidityTimestamp =
-      humidityHistory[humidityHistory.length - 1].timestamp;	  
+    $scope.humidityRecords = humidityHistory.length;
+    $scope.latestHumidity = humidityHistory[humidityHistory.length - 1].humidity;
+    $scope.humidityTimestamp = humidityHistory[humidityHistory.length - 1].timestamp;	  
   });
   $http.get('/lightHistory.json').success(function(lightHistory) {
     $scope.lightLevel = lightHistory;
-    $scope.latestLightLevel =
-      lightHistory[lightHistory.length - 1].light;
-    $scope.lightLevelTimestamp =
-      lightHistory[lightHistory.length - 1].timestamp;	  
+    $scope.lightRecords = lightHistory.length;
+    $scope.latestLightLevel = lightHistory[lightHistory.length - 1].light;
+    $scope.lightLevelTimestamp = lightHistory[lightHistory.length - 1].timestamp;	  
   });
   $http.get('/soilMoistureHistory.json').success(function(moistureHistory) {
     $scope.soilMoisture = [];
+    $scope.soilMoistureRecords = soilMoisture.length;
     moistureHistory.forEach(function(record) {
       $scope.soilMoisture.push({
         moisture: record.soil_moisture,
         timestamp: record.timestamp
       });
     });
-    $scope.latestSoilMoisture =
-      $scope.soilMoisture[$scope.soilMoisture.length - 1].moisture;
-    $scope.soilMoistureTimestamp =
-      $scope.soilMoisture[$scope.soilMoisture.length - 1].timestamp;	  
+    $scope.latestSoilMoisture = $scope.soilMoisture[$scope.soilMoisture.length - 1].moisture;
+    $scope.soilMoistureTimestamp = $scope.soilMoisture[$scope.soilMoisture.length - 1].timestamp;	  
   });
   $http.get('/wateringEventHistory.json').success(function(wateringEventHistory) {
     $scope.waterPumped = wateringEventHistory;
+    $scope.waterRecords = wateringEventHistory.length;
     if (wateringEventHistory.length >= 1) {
         $scope.latestPumpEvent1 = wateringEventHistory[wateringEventHistory.length - 1].water_pumped;
         $scope.pumpEventTimestamp1 = wateringEventHistory[wateringEventHistory.length - 1].timestamp;
