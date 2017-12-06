@@ -39,38 +39,51 @@
       <h1>Current Readings</h1>
       <table class="table table-hover">
         <tr>
+          <td><b>Sensor</b></td>
+          <td><b>Timestamp</b></td>          
+          <td><b>Total Records</b></td>
+          <td><b>Value</b></td>
+        </tr>        
+        <tr>
           <td>Temperature</td>
-          <td>{{ temperatureTimestamp }}</td>
+          <td>{{ temperatureTimestamp }}</td>          
+          <td>{{ temperatureRecords }}</td>
           <td>{{ latestTemperature | number:1 }} °C</td>
         </tr>
         <tr>
           <td>Humidity</td>
           <td>{{ humidityTimestamp }}</td>
+          <td>{{ humidityRecords }}</td>
           <td>{{ latestHumidity | number:1 }} %</td>
         </tr>
         <tr>
           <td>Light</td>
           <td>{{ lightLevelTimestamp }}</td>
+          <td>{{ lightRecords }}</td>
           <td>{{ latestLightLevel | number:1 }} %</td>
         </tr>
         <tr>
           <td>Soil Moisture</td>
           <td>{{ soilMoistureTimestamp }}</td>
+          <td>{{ soilMoistureRecords }}</td>
           <td>{{ latestSoilMoisture | number:1 }} %</td>
         </tr>
         <tr>
           <td>Water Pump Event -1</td>
           <td>{{ pumpEventTimestamp1 }}</td>
+          <td>{{ waterRecords1 }}</td>
           <td>{{ latestPumpEvent1 | number:0 }} ml</td>
         </tr>
         <tr>
           <td>Water Pump Event -2</td>
           <td>{{ pumpEventTimestamp2 }}</td>
+          <td>{{ waterRecords2 }}</td>
           <td>{{ latestPumpEvent2 | number:0 }} ml</td>
         </tr>
         <tr>
           <td>Water Pump Event -3</td>
           <td>{{ pumpEventTimestamp3 }}</td>
+          <td>{{ waterRecords3 }}</td>
           <td>{{ latestPumpEvent3 | number:0 }} ml</td>
         </tr>
       </table>
