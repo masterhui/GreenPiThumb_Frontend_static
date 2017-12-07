@@ -15,6 +15,12 @@ describe('greenPiThumbApp controller', function() {
         {'timestamp': '20170408T1330Z', 'temperature': 24.0},
         {'timestamp': '20170408T1345Z', 'temperature': 25.0}
       ]);
+    backend.expect('GET', '/waterLevelHistory.json').respond(
+      [
+        {'timestamp': '20170408T1315Z', 'water_level': 22.0},
+        {'timestamp': '20170408T1330Z', 'water_level': 29.0},
+        {'timestamp': '20170408T1345Z', 'water_level': 37.0}
+      ]);      
     backend.expect('GET', '/humidityHistory.json').respond(
       [
         {'timestamp': '20170408T1315Z', 'humidity': 51.0},
@@ -56,6 +62,7 @@ describe('greenPiThumbApp controller', function() {
 
   it('Creates latest* variables', function() {
     expect(mockScope.latestTemperature).toEqual(77.0);
+    expect(mockScope.latestWaterLevel).toEqual(35.0);
     expect(mockScope.latestHumidity).toEqual(53.0);
     expect(mockScope.latestLightLevel).toEqual(66.3);
     expect(mockScope.latestSoilMoisture).toBeCloseTo(86.8, 1);
@@ -63,6 +70,7 @@ describe('greenPiThumbApp controller', function() {
 
   it('Creates full history variables', function() {
     expect(mockScope.temperature).toBeDefined();
+    expect(mockScope.waterLevel).toBeDefined();
     expect(mockScope.humidity).toBeDefined();
     expect(mockScope.lightLevel).toBeDefined();
     expect(mockScope.soilMoisture).toBeDefined();

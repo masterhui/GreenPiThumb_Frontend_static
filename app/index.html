@@ -69,6 +69,12 @@
           <td>{{ latestSoilMoisture | number:1 }} %</td>
         </tr>
         <tr>
+          <td>Water Level</td>
+          <td>{{ waterLevelTimestamp }}</td>
+          <td>{{ waterLevelRecords }}</td>
+          <td>{{ latestWaterLevel | number:0 }} ml</td>
+        </tr>
+        <tr>
           <td>Water Pump Event -1</td>
           <td>{{ pumpEventTimestamp1 }}</td>
           <td>{{ waterRecords1 }}</td>
@@ -121,9 +127,11 @@
       <h3>Light</h3>
       <line-graph chart-data="lightLevel" value-property="light"></line-graph>
       <h3>Soil Moisture</h3>
-      <line-graph chart-data="soilMoisture" value-property="moisture"></line-graph>
+      <line-graph chart-data="soilMoisture" value-property="soil_moisture"></line-graph>
+      <h3>Water Level</h3>
+      <line-graph chart-data="waterLevel" value-property="water_level"></line-graph>      
       <h3>Watering Events</h3>
-      <line-graph-red-dot chart-data="waterPumped" value-property="water_pumped"></line-graph-red-dot>      
+      <line-graph-red-dot chart-data="waterPumped" value-property="water_pumped"></line-graph-red-dot>
     </div>
     <div class="row" id="about">
       <h1>About</h1>
