@@ -27,6 +27,7 @@ angular.module('greenPiThumbApp.directives')
 
           // Define the line
           var valueline = d3.line()
+            .interpolate("basis")
             .x(function(d) { return x(d.timestamp); })
             .y(function(d) { return y(d.value); });
 
