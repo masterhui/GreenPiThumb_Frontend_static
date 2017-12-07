@@ -38,12 +38,12 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
     $scope.latestTemperature = temperatureHistory[temperatureHistory.length - 1].temperature;
     $scope.temperatureTimestamp = formatDate(temperatureHistory[temperatureHistory.length - 1].timestamp);
   });
-  //~ $http.get('/waterLevelHistory.json').success(function(waterLevelHistory) {    
-    //~ $scope.waterLevel = waterLevelHistory;
-    //~ $scope.waterLevelRecords = waterLevelHistory.length;
-    //~ $scope.latestWaterLevel = waterLevelHistory[waterLevelHistory.length - 1].water_level;
-    //~ $scope.waterLevelTimestamp = formatDate(waterLevelHistory[waterLevelHistory.length - 1].timestamp);
-  //~ });  
+  $http.get('/waterLevelHistory.json').success(function(waterLevelHistory) {    
+    $scope.waterLevel = waterLevelHistory;
+    $scope.waterLevelRecords = waterLevelHistory.length;
+    $scope.latestWaterLevel = waterLevelHistory[waterLevelHistory.length - 1].water_level;
+    $scope.waterLevelTimestamp = formatDate(waterLevelHistory[waterLevelHistory.length - 1].timestamp);
+  });  
   $http.get('/humidityHistory.json').success(function(humidityHistory) {
     $scope.humidity = humidityHistory;
     $scope.humidityRecords = humidityHistory.length;
