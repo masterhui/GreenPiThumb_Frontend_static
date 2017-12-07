@@ -26,7 +26,8 @@ function formatDate(date_str) {
 	var date = createDateFromString(date_str);
 	var date_options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' };
   var date_formatted = date.toLocaleDateString("en-EN", date_options);
-  var date_time = date_formatted + " " + date.getHours() + ":" + date.getMinutes();    
+  var time = ('0'  + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
+  var date_time = date_formatted + " " + time;    
   return date_time;
 }
 
@@ -37,12 +38,12 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
     $scope.latestTemperature = temperatureHistory[temperatureHistory.length - 1].temperature;
     $scope.temperatureTimestamp = formatDate(temperatureHistory[temperatureHistory.length - 1].timestamp);
   });
-  $http.get('/waterLevelHistory.json').success(function(waterLevelHistory) {    
-    $scope.waterLevel = waterLevelHistory;
-    $scope.waterLevelRecords = waterLevelHistory.length;
-    $scope.latestWaterLevel = waterLevelHistory[waterLevelHistory.length - 1].water_level;
-    $scope.waterLevelTimestamp = formatDate(waterLevelHistory[waterLevelHistory.length - 1].timestamp);
-  });  
+  //~ $http.get('/waterLevelHistory.json').success(function(waterLevelHistory) {    
+    //~ $scope.waterLevel = waterLevelHistory;
+    //~ $scope.waterLevelRecords = waterLevelHistory.length;
+    //~ $scope.latestWaterLevel = waterLevelHistory[waterLevelHistory.length - 1].water_level;
+    //~ $scope.waterLevelTimestamp = formatDate(waterLevelHistory[waterLevelHistory.length - 1].timestamp);
+  //~ });  
   $http.get('/humidityHistory.json').success(function(humidityHistory) {
     $scope.humidity = humidityHistory;
     $scope.humidityRecords = humidityHistory.length;
