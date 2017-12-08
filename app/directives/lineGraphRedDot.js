@@ -63,17 +63,17 @@ angular.module('greenPiThumbApp.directives')
             ]);
 
             // Add the valueline path.
-            //~ svg.append('path')
-              //~ .attr('class', 'line')
+            svg.append('path')
+              .attr('class', 'line')
               //~ .style("stroke", "red")
-              //~ .attr('d', valueline(data));
+              .attr('d', valueline(data));
               
             // Add the scatterplot for tooltips.
             svg.selectAll('dot')
               .data(data)
             .enter().append('circle')
               .attr('r', 6)
-              .attr('fill', 'red' )
+              //~ .attr('fill', 'red' )
               .attr('cx', function(d) { return x(d.timestamp); })
               .attr('cy', function(d) { return y(d.value); })
               .on('mouseover', function(d) {
