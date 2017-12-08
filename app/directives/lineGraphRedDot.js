@@ -58,8 +58,8 @@ angular.module('greenPiThumbApp.directives')
             // Scale the range of the data
             x.domain(d3.extent(data, function(d) { return d.timestamp; }));
             y.domain([
-              d3.min(data, function(d) { return d.value; }),
-              d3.max(data, function(d) { return d.value; })
+              d3.min(data, function(d) { return 0; }),        //d.value
+              d3.max(data, function(d) { return 1200; })   //d.value
             ]);
 
             // Add the valueline path.

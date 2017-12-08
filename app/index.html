@@ -48,13 +48,13 @@
           <td>Temperature</td>
           <td>{{ temperatureTimestamp }}</td>          
           <td>{{ temperatureRecords }}</td>
-          <td>{{ latestTemperature | number:1 }} °C</td>
+          <td>{{ latestTemperature | number:0 }} °C</td>
         </tr>
         <tr>
           <td>Humidity</td>
           <td>{{ humidityTimestamp }}</td>
           <td>{{ humidityRecords }}</td>
-          <td>{{ latestHumidity | number:1 }} %</td>
+          <td>{{ latestHumidity | number:0 }} %</td>
         </tr>
         <tr>
           <td>Light</td>
@@ -72,7 +72,7 @@
           <td>Water Fill Level</td>
           <td>{{ waterLevelTimestamp }}</td>
           <td>{{ waterLevelRecords }}</td>
-          <td>{{ latestWaterLevel | number:1 }} %</td>
+          <td ng-style="customStyle.style">{{ latestWaterLevel | number:0 }} %</td>
         </tr>
         <tr>
           <td>Water Pump Event -1</td>
@@ -121,17 +121,17 @@
     <div class="row" id="history">
       <h1>History</h1>
       <h3>Temperature</h3>
-      <line-graph chart-data="temperature" value-property="temperature"></line-graph>
+      <line-graph chart-data="temperature" value-property="temperature" type="temperature"></line-graph>
       <h3>Humidity</h3>
-      <line-graph chart-data="humidity" value-property="humidity"></line-graph>
+      <line-graph chart-data="humidity" value-property="humidity" type="humidity"></line-graph>
       <h3>Light</h3>
-      <line-graph chart-data="lightLevel" value-property="light"></line-graph>
+      <line-graph chart-data="lightLevel" value-property="light" type="light"></line-graph>
       <h3>Soil Moisture</h3>
-      <line-graph chart-data="soilMoisture" value-property="soil_moisture"></line-graph>
-      <h3>Water Level</h3>
-      <line-graph chart-data="waterLevel" value-property="water_level"></line-graph>      
+      <line-graph chart-data="soilMoisture" value-property="soil_moisture" type="soil_moisture"></line-graph>
       <h3>Watering Events</h3>
-      <line-graph-red-dot chart-data="waterPumped" value-property="water_pumped"></line-graph-red-dot>
+      <line-graph-red-dot chart-data="waterPumped" value-property="water_pumped" type="water_pumped"></line-graph-red-dot>      
+      <h3>Water Level</h3>
+      <line-graph chart-data="waterLevel" value-property="water_level" type="water_level"></line-graph>
     </div>
     <div class="row" id="about">
       <h1>About</h1>

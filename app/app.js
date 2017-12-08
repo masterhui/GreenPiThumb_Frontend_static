@@ -43,6 +43,8 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
     $scope.waterLevelRecords = waterLevelHistory.length;
     $scope.latestWaterLevel = waterLevelHistory[waterLevelHistory.length - 1].water_level;
     $scope.waterLevelTimestamp = formatDate(waterLevelHistory[waterLevelHistory.length - 1].timestamp);
+    $scope.customStyle = {};
+    $scope.customStyle.style = ($scope.latestWaterLevel <= 20) ? {"color":"red"} : {"color":"black"};    
   });  
   $http.get('/humidityHistory.json').success(function(humidityHistory) {
     $scope.humidity = humidityHistory;

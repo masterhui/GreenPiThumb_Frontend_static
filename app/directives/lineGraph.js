@@ -1,13 +1,28 @@
 'use strict';
 
+var TEMPERATURE_MIN = 12;
+var TEMPERATURE_MAX = 28;
+var HUMIDITY_MIN = 0;
+var HUMIDITY_MAX = 100;
+var LIGHT_MIN = 0;
+var LIGHT_MAX = 100;
+var SOIL_MOISTURE_MIN = 0;
+var SOIL_MOISTURE_MAX = 100;
+var WATER_PUMPED_MIN = 0;
+var WATER_PUMPED_MAX = 1200;
+var WATER_LEVEL_MIN = 0;
+var WATER_LEVEL_MAX = 100;
+
 angular.module('greenPiThumbApp.directives')
   .directive('lineGraph', ['d3Service', function(d3Service) {
     return {
       restrict: 'E',
       replace: false,
-      scope: {data: '=chartData'},
+      scope: {data: '=chartData', type: '@'},
+      //template:'<div class="type"><h2>type is {{type}}</h2></div>',
       link: function(scope, element, attrs) {
         d3Service.d3().then(function(d3) {
+            
           // Set the dimensions of the canvas / graph
           var margin = {top: 30, right: 20, bottom: 30, left: 50};
           var width = 900 - margin.left - margin.right;
@@ -40,8 +55,46 @@ angular.module('greenPiThumbApp.directives')
           var formatTime = d3.timeFormat('%I:%M %p');
           var formatValue = d3.format('.1f');
           var formatDate = d3.timeFormat('%Y-%m-%d');
+          
+          function getMinRange() { 
+            var retVal = 0;
+            
+            if (attrs.type === "temperature")
+              retVal = TEMPERATURE_MIN   ;
+            else if (attrs.type === "humidity")
+              retVal = HUMIDITY_MIN;
+            else if (attrs.type === "light")
+              retVal = LIGHT_MIN;
+            else if (attrs.type === "soil_moisture")
+              retVal = SOIL_MOISTURE_MIN;
+            else if (attrs.type === "water_pumped")
+              retVal = WATER_PUMPED_MIN;
+            else if (attrs.type === "water_level")
+              retVal = WATER_LEVEL_MIN;                                                
 
-          var updateGraph = function(data) {
+            return retVal;
+          }
+      
+          function getMaxRange() {
+            var retVal = 0;
+            
+            if (attrs.type === "temperature")
+              retVal = TEMPERATURE_MAX;
+            else if (attrs.type === "humidity")
+              retVal = HUMIDITY_MAX;
+            else if (attrs.type === "light")
+              retVal = LIGHT_MAX;
+            else if (attrs.type === "soil_moisture")
+              retVal = SOIL_MOISTURE_MAX;
+            else if (attrs.type === "water_pumped")
+              retVal = WATER_PUMPED_MAX;
+            else if (attrs.type === "water_level")
+              retVal = WATER_LEVEL_MAX;                                                
+
+            return retVal;
+          }          
+
+          var updateGraph = function(data, type) { 
             data.forEach(function(d) {
               d.timestamp = parseTimestamp(d.timestamp);
               d.value = scope.$eval(attrs.valueProperty, d);
@@ -56,11 +109,11 @@ angular.module('greenPiThumbApp.directives')
                 .attr('transform',
                       'translate(' + margin.left + ',' + margin.top + ')');
 
-            // Scale the range of the data
+            // Scale the range of the data            
             x.domain(d3.extent(data, function(d) { return d.timestamp; }));
             y.domain([
-              d3.min(data, function(d) { return d.value; }),
-              d3.max(data, function(d) { return d.value; })
+              d3.min(data, function(d) { return getMinRange(); }),
+              d3.max(data, function(d) { return getMaxRange(); })            
             ]);
 
             // Add the valueline path.
