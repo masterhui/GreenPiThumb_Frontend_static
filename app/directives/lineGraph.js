@@ -92,7 +92,33 @@ angular.module('greenPiThumbApp.directives')
               retVal = WATER_LEVEL_MAX;                                                
 
             return retVal;
-          }          
+          }     
+          
+          function getYAxisLabel() {
+            var label = "";
+            
+            if (attrs.type === "temperature")
+              label = "Temperature [°C]";
+            else if (attrs.type === "humidity")
+              label = "Humidity [%]";
+            else if (attrs.type === "light")
+              label = "Brightness [%]";
+            else if (attrs.type === "soil_moisture")
+              label = "Soil Moisture [%]";
+            else if (attrs.type === "water_pumped")
+              label = "Pump Event [ml]";
+            else if (attrs.type === "water_level")
+              label = "Tank Level [%]";                                                
+
+            return label;
+          }
+          
+          function getDotRadius() {
+            if(attrs.type === "water_pumped") 
+              return 6.0;
+            else
+              return 2.5;
+          }
 
           var updateGraph = function(data, type) { 
             data.forEach(function(d) {
@@ -125,7 +151,7 @@ angular.module('greenPiThumbApp.directives')
             svg.selectAll('dot')
               .data(data)
             .enter().append('circle')
-              .attr('r', 2.5)
+              .attr('r', getDotRadius() )
               .attr('cx', function(d) { return x(d.timestamp); })
               .attr('cy', function(d) { return y(d.value); })
               .on('mouseover', function(d) {
@@ -150,11 +176,25 @@ angular.module('greenPiThumbApp.directives')
               .attr('class', 'x axis')
               .attr('transform', 'translate(0,' + height + ')')
               .call(xAxis);
+              
+            svg.append("text") // text label for the x axis
+              .attr("x", width / 2 )
+              .attr("y", height + margin.bottom)
+              .style("text-anchor", "middle")
+              .text("Time");              
 
             // Add the Y Axis
             svg.append('g')
               .attr('class', 'y axis')
               .call(yAxis);
+              
+            svg.append("text")
+              .attr("transform", "rotate(-90)")
+              .attr("y", 0 - margin.left)
+              .attr("x",0 - (height / 2))
+              .attr("dy", "1em")
+              .style("text-anchor", "middle")
+              .text(getYAxisLabel());              
           };
           scope.$watch('data', function(newValue) {
             if (!newValue) { return; }

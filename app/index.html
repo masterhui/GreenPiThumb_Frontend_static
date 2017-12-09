@@ -69,7 +69,7 @@
           <td>{{ latestSoilMoisture | number:1 }} %</td>
         </tr>
         <tr>
-          <td>Water Fill Level</td>
+          <td>Water Tank Level</td>
           <td>{{ waterLevelTimestamp }}</td>
           <td>{{ waterLevelRecords }}</td>
           <td ng-style="customStyle.style">{{ latestWaterLevel | number:0 }} %</td>
@@ -129,8 +129,8 @@
       <h3>Soil Moisture</h3>
       <line-graph chart-data="soilMoisture" value-property="soil_moisture" type="soil_moisture"></line-graph>
       <h3>Watering Events</h3>
-      <line-graph-red-dot chart-data="waterPumped" value-property="water_pumped" type="water_pumped"></line-graph-red-dot>      
-      <h3>Water Level</h3>
+      <line-graph chart-data="waterPumped" value-property="water_pumped" type="water_pumped"></line-graph>      
+      <h3>Water Tank Level</h3>
       <line-graph chart-data="waterLevel" value-property="water_level" type="water_level"></line-graph>
     </div>
     <div class="row" id="about">
