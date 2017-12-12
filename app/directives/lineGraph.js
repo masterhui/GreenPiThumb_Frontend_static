@@ -24,7 +24,7 @@ angular.module('greenPiThumbApp.directives')
         d3Service.d3().then(function(d3) {
             
           // Set the dimensions of the canvas / graph
-          var margin = {top: 30, right: 20, bottom: 30, left: 50};
+          var margin = {top: 30, right: 20, bottom: 50, left: 50};
           var width = 900 - margin.left - margin.right;
           var height = 450 - margin.top - margin.bottom;
 
@@ -35,8 +35,15 @@ angular.module('greenPiThumbApp.directives')
           var y = d3.scaleLinear().range([height, 0]);
 
           // Define the axes
-          var xAxis = d3.axisBottom(x)
-            .ticks(5);
+          function xTickMajorFunc() { return d3.timeHour.every(1); }
+          var xAxisMajor = d3.axisBottom(x)
+            .ticks(xTickMajorFunc())
+            .tickFormat(d3.timeFormat('%H'));
+          var xAxisMinor = d3.axisBottom(x)
+            .ticks(d3.timeDay.every(1))
+            .tickFormat(d3.timeFormat('%a, %x'))
+            .tickSize(10)
+            .tickPadding(15);
           var yAxis = d3.axisLeft(y)
             .ticks(5);
 
@@ -59,7 +66,7 @@ angular.module('greenPiThumbApp.directives')
           function getMinRange() { 
             var retVal = 0;
             
-            if (attrs.type === "temperature")
+            if (attrs.type === "temperature")            
               retVal = TEMPERATURE_MIN   ;
             else if (attrs.type === "humidity")
               retVal = HUMIDITY_MIN;
@@ -180,29 +187,44 @@ angular.module('greenPiThumbApp.directives')
                     .style('opacity', 0);
                 });
 
-            // Add the X Axis
+            // We use major and minor ticks according to d3v4, seen here: https://stackoverflow.com/questions/21643787/d3-js-alternative-to-axis-ticksubdivide
+            // Add the major x axis
             svg.append('g')
               .attr('class', 'x axis')
               .attr('transform', 'translate(0,' + height + ')')
-              .call(xAxis);
-              
-            svg.append("text") // text label for the x axis
+              .call(xAxisMajor);
+            
+            // Add the minor x axis  
+            svg.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(xAxisMinor)              
+              .selectAll(".tick")
+              .data(x.ticks(xTickMajorFunc()), function(d) { return d; })
+              .exit()
+              .classed("minor", true);              
+            
+            // Add text label for the x axis
+            svg.append("text") 
               .attr("x", width / 2 )
               .attr("y", height + margin.bottom)
               .style("text-anchor", "middle")
+              .style("font-weight", "bold")
               .text("Time");              
 
-            // Add the Y Axis
+            // Add the y axis
             svg.append('g')
               .attr('class', 'y axis')
               .call(yAxis);
               
+            // Add text label for the y axis
             svg.append("text")
               .attr("transform", "rotate(-90)")
               .attr("y", 0 - margin.left)
               .attr("x",0 - (height / 2))
               .attr("dy", "1em")
               .style("text-anchor", "middle")
+              .style("font-weight", "bold")
               .text(getYAxisLabel());              
           };
           scope.$watch('data', function(newValue) {
