@@ -1,7 +1,7 @@
 'use strict';
 
-var TEMPERATURE_MIN = 12;
-var TEMPERATURE_MAX = 28;
+var TEMPERATURE_MIN = 0;
+var TEMPERATURE_MAX = 30;
 var HUMIDITY_MIN = 0;
 var HUMIDITY_MAX = 100;
 var LIGHT_MIN = 0;
@@ -9,7 +9,7 @@ var LIGHT_MAX = 100;
 var SOIL_MOISTURE_MIN = 0;
 var SOIL_MOISTURE_MAX = 100;
 var WATER_PUMPED_MIN = 0;
-var WATER_PUMPED_MAX = 1200;
+var WATER_PUMPED_MAX = 4000;
 var WATER_LEVEL_MIN = 0;
 var WATER_LEVEL_MAX = 100;
 
@@ -117,8 +117,15 @@ angular.module('greenPiThumbApp.directives')
             if(attrs.type === "water_pumped") 
               return 6.0;
             else
-              return 2.5;
+              return 1.0;
           }
+          
+          function getDotColor() {
+            if(attrs.type === "water_pumped") 
+              return "steelblue";
+            else
+              return "black";
+          }          
 
           var updateGraph = function(data, type) { 
             data.forEach(function(d) {
@@ -144,6 +151,7 @@ angular.module('greenPiThumbApp.directives')
 
             // Add the valueline path.
             svg.append('path')
+              //~ .style("stroke", "red")
               .attr('class', 'line')
               .attr('d', valueline(data));
               
@@ -152,6 +160,7 @@ angular.module('greenPiThumbApp.directives')
               .data(data)
             .enter().append('circle')
               .attr('r', getDotRadius() )
+              .attr('fill', getDotColor() )
               .attr('cx', function(d) { return x(d.timestamp); })
               .attr('cy', function(d) { return y(d.value); })
               .on('mouseover', function(d) {
