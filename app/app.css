@@ -30,6 +30,10 @@ path {
   fill: none;
 }
 
+.line {
+  clip-path: url(#clip);
+}
+
 .area {
   fill: steelblue;
   clip-path: url(#clip);

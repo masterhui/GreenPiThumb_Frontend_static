@@ -21,12 +21,7 @@ angular.module('greenPiThumbApp.directives')
       scope: {data: '=chartData', type: '@'},
       //template:'<div class="type"><h2>type is {{type}}</h2></div>',
       link: function(scope, element, attrs) {
-        d3Service.d3().then(function(d3) {
-        
-          //~ var svg = d3.select(element[0]),
-              //~ margin = {top: 30, right: 20, bottom: 50, left: 50},
-              //~ width = 900 - margin.left - margin.right,
-              //~ height = 450 - margin.top - margin.bottom;            
+        d3Service.d3().then(function(d3) {           
           
           // Set the dimensions of the canvas / graph
           var margin = {top: 30, right: 20, bottom: 50, left: 50};
@@ -60,8 +55,8 @@ angular.module('greenPiThumbApp.directives')
               .y1(function(d) { return y(d.value); });   
 
           // Define the line
-          var valueline = d3.line()
-            //~ .curve(d3.curveBasis)
+          var line = d3.line()
+            .curve(d3.curveBasis)
             .x(function(d) { return x(d.timestamp); })
             .y(function(d) { return y(d.value); });
 
@@ -144,7 +139,21 @@ angular.module('greenPiThumbApp.directives')
               return "steelblue";
             else
               return "black";
-          }                                       
+          }  
+          
+         function getVizStr() {
+            if(attrs.type === "water_level") 
+              return "area";
+            else
+              return "line";
+          }  
+          
+         function getVizObj() {
+            if(attrs.type === "water_level") 
+              return area;
+            else
+              return line;
+          }           
 
           var updateGraph = function(data, type) { 
             data.forEach(function(d) {
@@ -177,14 +186,14 @@ angular.module('greenPiThumbApp.directives')
               d3.max(data, function(d) { return getMaxRange(); })            
             ]);
 
-            // Add the valueline path.
+            // Add path and line
             g.append('path')
               //~ .style("stroke", "red")
-              //~ .attr('class', 'line')
-              //~ .attr('d', valueline(data));
               .datum(data)
-              .attr('class', 'area')
-              .attr('d', area);              
+              .attr('class', getVizStr())
+              .attr('d', getVizObj());
+              //~ .attr('class', 'area')
+              //~ .attr('d', area);              
               
             // Add the scatterplot for tooltips.
             //~ g.selectAll('dot')
@@ -254,12 +263,8 @@ angular.module('greenPiThumbApp.directives')
             // Set default time domain (x zoom range)
             var timeDomainStart = new Date(d3.timeDay.offset(new Date(), 0).setHours(-4)); 
             var timeDomainEnd = d3.timeDay.offset(new Date(), 0);
-            //~ console.log("timeDomainStart:" + timeDomainStart); 
-            //~ console.log("timeDomainEnd:" + timeDomainEnd);
             var d0 = new Date(timeDomainStart),
                 d1 = new Date(timeDomainEnd);
-            
-            console.log("updateGraph()");
             
             var zoom = d3.zoom()
               .scaleExtent([1, 32])
@@ -275,9 +280,8 @@ angular.module('greenPiThumbApp.directives')
                     .translate(-x(d0), 0));             
                                   
             function zoomed() {
-              console.log("zoomed()");
               var t = d3.event.transform, xt = t.rescaleX(x);
-              g.select(".area").attr("d", area.x(function(d) { return xt(d.timestamp); }));
+              g.select(".line").attr("d", line.x(function(d) { return xt(d.timestamp); }));
               g.select(".axis--x").call(xAxisMajor.scale(xt));
             }                        
           };
