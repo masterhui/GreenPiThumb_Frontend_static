@@ -214,13 +214,13 @@ angular.module('greenPiThumbApp.directives')
             // We use major and minor ticks according to d3v4, seen here: https://stackoverflow.com/questions/21643787/d3-js-alternative-to-axis-ticksubdivide
             // Add the major x axis
             g.append('g')
-              .attr('class', 'x axis')
+              .attr('class', 'axis axis--x')
               .attr('transform', 'translate(0,' + height + ')')
               .call(xAxisMajor);
             
             // Add the minor x axis  
             g.append("g")
-              .attr("class", "x axis")
+              .attr("class", "axis axis--x")
               .attr("transform", "translate(0," + height + ")")
               .call(xAxisMinor)              
               .selectAll(".tick")
@@ -238,7 +238,7 @@ angular.module('greenPiThumbApp.directives')
 
             // Add the y axis
             g.append('g')
-              .attr('class', 'y axis')
+              .attr('class', 'axis axis--y')
               .call(yAxis);
               
             // Add text label for the y axis
