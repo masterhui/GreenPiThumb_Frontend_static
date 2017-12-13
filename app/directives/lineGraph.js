@@ -12,6 +12,7 @@ var WATER_PUMPED_MIN = 0;
 var WATER_PUMPED_MAX = 4000;
 var WATER_LEVEL_MIN = 0;
 var WATER_LEVEL_MAX = 100;
+var DEFAULT_TIME_DOMAIN = 12;   // [hrs]
 
 angular.module('greenPiThumbApp.directives')
   .directive('lineGraph', ['d3Service', function(d3Service) {
@@ -131,7 +132,7 @@ angular.module('greenPiThumbApp.directives')
             if(attrs.type === "water_pumped") 
               return 6.0;
             else
-              return 1.0;
+              return 0.0;
           }
           
           function getDotColor() {
@@ -166,8 +167,6 @@ angular.module('greenPiThumbApp.directives')
               .append('svg')
                 .attr('width', width + margin.left + margin.right)
                 .attr('height', height + margin.top + margin.bottom);
-              //~ .append('g')
-                //~ .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
               
             svg.append("defs").append("clipPath")
                 .attr("id", "clip")
@@ -177,7 +176,6 @@ angular.module('greenPiThumbApp.directives')
                 
             var g = svg.append("g")
               .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
-                        
                         
             // Scale the range of the data            
             x.domain(d3.extent(data, function(d) { return d.timestamp; }));
@@ -191,45 +189,44 @@ angular.module('greenPiThumbApp.directives')
               //~ .style("stroke", "red")
               .datum(data)
               .attr('class', getVizStr())
-              .attr('d', getVizObj());
-              //~ .attr('class', 'area')
-              //~ .attr('d', area);              
+              .attr('d', getVizObj());        
               
             // Add the scatterplot for tooltips.
-            //~ g.selectAll('dot')
-              //~ .data(data)
-            //~ .enter().append('circle')
-              //~ .attr('r', getDotRadius() )
-              //~ .attr('fill', getDotColor() )
-              //~ .attr('cx', function(d) { return x(d.timestamp); })
-              //~ .attr('cy', function(d) { return y(d.value); })
-              //~ .on('mouseover', function(d) {
-                    //~ div.transition()
-                      //~ .duration(200)
-                      //~ .style('opacity', 0.9);
-                    //~ div.html(
-                      //~ formatValue(d.value) + '<br />' +
-                      //~ formatTime(d.timestamp) + '<br />' +
-                      //~ formatDate(d.timestamp))
-                      //~ .style('left', (d3.event.pageX + 3) + 'px')
-                      //~ .style('top', (d3.event.pageY - 52) + 'px');
-                  //~ })
-                //~ .on('mouseout', function(d) {
-                  //~ div.transition()
-                    //~ .duration(500)
-                    //~ .style('opacity', 0);
-                //~ });
+            g.append("g")
+              .selectAll('dot')
+              .data(data)
+              .enter().append('circle')
+                .attr('r', getDotRadius() )
+                .attr('fill', getDotColor() )
+                .attr('cx', function(d) { return x(d.timestamp); })
+                .attr('cy', function(d) { return y(d.value); })
+                .on('mouseover', function(d) {
+                      div.transition()
+                        .duration(200)
+                        .style('opacity', 0.9);
+                      div.html(
+                        formatValue(d.value) + '<br />' +
+                        formatTime(d.timestamp) + '<br />' +
+                        formatDate(d.timestamp))
+                        .style('left', (d3.event.pageX + 3) + 'px')
+                        .style('top', (d3.event.pageY - 52) + 'px');
+                    })
+                  .on('mouseout', function(d) {
+                    div.transition()
+                      .duration(500)
+                      .style('opacity', 0);
+                  });
 
             // We use major and minor ticks according to d3v4, seen here: https://stackoverflow.com/questions/21643787/d3-js-alternative-to-axis-ticksubdivide
             // Add the major x axis
             g.append('g')
-              .attr('class', 'axis axis--x')
+              .attr('class', 'axis axisMajor--x')
               .attr('transform', 'translate(0,' + height + ')')
               .call(xAxisMajor);
             
             // Add the minor x axis  
             g.append("g")
-              .attr("class", "axis axis--x")
+              .attr("class", "axis axisMinor--x")
               .attr("transform", "translate(0," + height + ")")
               .call(xAxisMinor)              
               .selectAll(".tick")
@@ -261,7 +258,7 @@ angular.module('greenPiThumbApp.directives')
               .text(getYAxisLabel());   
               
             // Set default time domain (x zoom range)
-            var timeDomainStart = new Date(d3.timeDay.offset(new Date(), 0).setHours(-4)); 
+            var timeDomainStart = new Date(d3.timeDay.offset(new Date(), 0).setHours(-DEFAULT_TIME_DOMAIN-2)); 
             var timeDomainEnd = d3.timeDay.offset(new Date(), 0);
             var d0 = new Date(timeDomainStart),
                 d1 = new Date(timeDomainEnd);
@@ -282,7 +279,8 @@ angular.module('greenPiThumbApp.directives')
             function zoomed() {
               var t = d3.event.transform, xt = t.rescaleX(x);
               g.select(".line").attr("d", line.x(function(d) { return xt(d.timestamp); }));
-              g.select(".axis--x").call(xAxisMajor.scale(xt));
+              g.select(".axisMajor--x").call(xAxisMajor.scale(xt));
+              g.select(".axisMinor--x").call(xAxisMinor.scale(xt));
             }                        
           };
           
