@@ -279,6 +279,7 @@ angular.module('greenPiThumbApp.directives')
             function zoomed() {
               var t = d3.event.transform, xt = t.rescaleX(x);
               g.select(".line").attr("d", line.x(function(d) { return xt(d.timestamp); }));
+              g.select(".area").attr("d", area.x(function(d) { return xt(d.timestamp); }));
               g.select(".axisMajor--x").call(xAxisMajor.scale(xt));
               g.select(".axisMinor--x").call(xAxisMinor.scale(xt));
             }                        
