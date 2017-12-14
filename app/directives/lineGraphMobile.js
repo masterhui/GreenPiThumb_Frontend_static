@@ -12,7 +12,9 @@ var WATER_PUMPED_MIN = 0;
 var WATER_PUMPED_MAX = 4000;
 var WATER_LEVEL_MIN = 0;
 var WATER_LEVEL_MAX = 100;
-var DEFAULT_TIME_DOMAIN = 48;   // [hrs]
+var DEFAULT_TIME_DOMAIN = 24;   // [hrs]
+var FONT_SIZE = 14
+var FONT_SIZE_LABEL = 16
 
 angular.module('greenPiThumbApp.directives')
   .directive('lineGraph', ['d3Service', function(d3Service) {
@@ -22,16 +24,16 @@ angular.module('greenPiThumbApp.directives')
       scope: {data: '=chartData', type: '@'},
       //template:'<div class="type"><h2>type is {{type}}</h2></div>',
       link: function(scope, element, attrs) {
-        d3Service.d3().then(function(d3) {           
-          
+        d3Service.d3().then(function(d3) {
+            
           // Set the dimensions of the canvas / graph
           var margin = {top: 30, right: 20, bottom: 50, left: 50};
-          var width = 900 - margin.left - margin.right;
+          var width = 650 - margin.left - margin.right;
           var height = 450 - margin.top - margin.bottom;
-          
-          var parseTimestamp = d3.utcParse('%Y%m%dT%H%M%Z');   
-    
-          // Set the ranges    
+
+          var parseTimestamp = d3.utcParse('%Y%m%dT%H%M%Z');
+
+          // Set the ranges
           var x = d3.scaleTime().range([0, width]);
           var y = d3.scaleLinear().range([height, 0]);
 
@@ -48,15 +50,8 @@ angular.module('greenPiThumbApp.directives')
           var yAxis = d3.axisLeft(y)
             .ticks(5);
 
-          // Define the area
-          var area = d3.area()
-              .curve(d3.curveMonotoneX)
-              .x(function(d) { return x(d.timestamp); })
-              .y0(height)
-              .y1(function(d) { return y(d.value); });   
-
           // Define the line
-          var line = d3.line()
+          var valueline = d3.line()
             //~ .curve(d3.curveBasis)
             .x(function(d) { return x(d.timestamp); })
             .y(function(d) { return y(d.value); });
@@ -132,7 +127,7 @@ angular.module('greenPiThumbApp.directives')
             if(attrs.type === "water_pumped") 
               return 6.0;
             else
-              return 0.0;
+              return 2.0;
           }
           
           function getDotColor() {
@@ -140,21 +135,7 @@ angular.module('greenPiThumbApp.directives')
               return "steelblue";
             else
               return "black";
-          }  
-          
-         function getVizStr() {
-            if(attrs.type === "water_level") 
-              return "area";
-            else
-              return "line";
-          }  
-          
-         function getVizObj() {
-            if(attrs.type === "water_level") 
-              return area;
-            else
-              return line;
-          }           
+          }          
 
           var updateGraph = function(data, type) { 
             data.forEach(function(d) {
@@ -162,21 +143,21 @@ angular.module('greenPiThumbApp.directives')
               d.value = scope.$eval(attrs.valueProperty, d);
             });
             
+            // Filter the date range
+            var timeDomainStart = new Date(d3.timeDay.offset(new Date(), 0).setHours(-DEFAULT_TIME_DOMAIN)); 
+            data = data.filter(function(d) {
+              return d.timestamp > timeDomainStart
+            })            
+
             // Add the svg canvas
             var svg = d3.select(element[0])
               .append('svg')
                 .attr('width', width + margin.left + margin.right)
-                .attr('height', height + margin.top + margin.bottom);
-              
-            svg.append("defs").append("clipPath")
-                .attr("id", "clip")
-              .append("rect")
-                .attr("width", width)
-                .attr("height", height);                       
-                
-            var g = svg.append("g")
-              .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
-                        
+                .attr('height', height + margin.top + margin.bottom)
+              .append('g')
+                .attr('transform',
+                      'translate(' + margin.left + ',' + margin.top + ')');
+
             // Scale the range of the data            
             x.domain(d3.extent(data, function(d) { return d.timestamp; }));
             y.domain([
@@ -184,50 +165,51 @@ angular.module('greenPiThumbApp.directives')
               d3.max(data, function(d) { return getMaxRange(); })            
             ]);
 
-            // Add path and line
-            g.append('path')
+            // Add the valueline path.
+            svg.append('path')
               //~ .style("stroke", "red")
-              .datum(data)
-              .attr('class', getVizStr())
-              .attr('d', getVizObj());        
+              .attr('class', 'line')
+              .attr('d', valueline(data));
               
             // Add the scatterplot for tooltips.
-            g.append("g")
-              .selectAll('dot')
+            svg.selectAll('dot')
               .data(data)
-              .enter().append('circle')
-                .attr('r', getDotRadius() )
-                .attr('fill', getDotColor() )
-                .attr('cx', function(d) { return x(d.timestamp); })
-                .attr('cy', function(d) { return y(d.value); })
-                .on('mouseover', function(d) {
-                      div.transition()
-                        .duration(200)
-                        .style('opacity', 0.9);
-                      div.html(
-                        formatValue(d.value) + '<br />' +
-                        formatTime(d.timestamp) + '<br />' +
-                        formatDate(d.timestamp))
-                        .style('left', (d3.event.pageX + 3) + 'px')
-                        .style('top', (d3.event.pageY - 52) + 'px');
-                    })
-                  .on('mouseout', function(d) {
+            .enter().append('circle')
+              .attr('r', getDotRadius() )
+              .attr('fill', getDotColor() )
+              .attr('cx', function(d) { return x(d.timestamp); })
+              .attr('cy', function(d) { return y(d.value); })
+              .on('mouseover', function(d) {
                     div.transition()
-                      .duration(500)
-                      .style('opacity', 0);
-                  });
+                      .duration(200)
+                      .style('opacity', 0.9);
+                    div.html(
+                      formatValue(d.value) + '<br />' +
+                      formatTime(d.timestamp) + '<br />' +
+                      formatDate(d.timestamp))
+                      .style('left', (d3.event.pageX + 3) + 'px')
+                      .style('top', (d3.event.pageY - 52) + 'px');
+                  })
+                .on('mouseout', function(d) {
+                  div.transition()
+                    .duration(500)
+                    .style('opacity', 0);
+                });
 
             // We use major and minor ticks according to d3v4, seen here: https://stackoverflow.com/questions/21643787/d3-js-alternative-to-axis-ticksubdivide
             // Add the major x axis
-            g.append('g')
-              .attr('class', 'axis axisMajor--x')
+            svg.append('g')
+              .attr('class', 'x axis')
               .attr('transform', 'translate(0,' + height + ')')
+              .attr('axis', 'font: 14px sans-serif')
+              .style("font-size", FONT_SIZE)
               .call(xAxisMajor);
             
             // Add the minor x axis  
-            g.append("g")
-              .attr("class", "axis axisMinor--x")
+            svg.append("g")
+              .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
+              .style("font-size", FONT_SIZE)
               .call(xAxisMinor)              
               .selectAll(".tick")
               .data(x.ticks(xTickMajorFunc()), function(d) { return d; })
@@ -235,61 +217,35 @@ angular.module('greenPiThumbApp.directives')
               .classed("minor", true);              
             
             // Add text label for the x axis
-            g.append("text") 
+            svg.append("text") 
               .attr("x", width / 2 )
               .attr("y", height + margin.bottom)
               .style("text-anchor", "middle")
               .style("font-weight", "bold")
+              .style("font-size", FONT_SIZE_LABEL)
               .text("Time");              
 
             // Add the y axis
-            g.append('g')
-              .attr('class', 'axis axis--y')
+            svg.append('g')
+              .attr('class', 'y axis')
+              .style("font-size", FONT_SIZE)
               .call(yAxis);
               
             // Add text label for the y axis
-            g.append("text")
+            svg.append("text")
               .attr("transform", "rotate(-90)")
               .attr("y", 0 - margin.left)
               .attr("x",0 - (height / 2))
               .attr("dy", "1em")
               .style("text-anchor", "middle")
               .style("font-weight", "bold")
-              .text(getYAxisLabel());   
-              
-            // Set default time domain (x zoom range)
-            var timeDomainStart = new Date(d3.timeDay.offset(new Date(), 0).setHours(-DEFAULT_TIME_DOMAIN)); 
-            var timeDomainEnd = d3.timeDay.offset(new Date(), 0);
-            var d0 = new Date(timeDomainStart),
-                d1 = new Date(timeDomainEnd);
-            
-            var zoom = d3.zoom()
-              .scaleExtent([1, 32])
-              .translateExtent([[0, 0], [width, height]])
-              .extent([[0, 0], [width, height]])
-              .on("zoom", zoomed);                
-              
-            // Gratuitous intro zoom!
-            svg.call(zoom).transition()
-                .duration(1500)
-                .call(zoom.transform, d3.zoomIdentity
-                    .scale(width / (x(d1) - x(d0)))
-                    .translate(-x(d0), 0));             
-                                  
-            function zoomed() {
-              var t = d3.event.transform, xt = t.rescaleX(x);
-              g.select(".line").attr("d", line.x(function(d) { return xt(d.timestamp); }));
-              g.select(".area").attr("d", area.x(function(d) { return xt(d.timestamp); }));
-              g.select(".axisMajor--x").call(xAxisMajor.scale(xt));
-              g.select(".axisMinor--x").call(xAxisMinor.scale(xt));
-            }                        
+              .style("font-size", FONT_SIZE_LABEL)
+              .text(getYAxisLabel());              
           };
-          
           scope.$watch('data', function(newValue) {
             if (!newValue) { return; }
             updateGraph(newValue);
           });
-          
         });
       }
     };

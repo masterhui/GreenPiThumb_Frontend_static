@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" ng-app="greenPiThumbApp" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" ng-app="greenPiThumbApp" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" ng-app="greenPiThumbApp" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" ng-app="greenPiThumbApp" class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>GreenPiThumb</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="app.css">
+</head>
+<body ng-controller="DashboardCtrl" data-spy="scroll" data-target="spy-scroll-id">
+  <nav class="navbar navbar-default navbar-static-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">GreenPiThumb</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="#">Current Readings</a></li>
+          <li><a href="#camera">Camera</a></li>
+          <li><a href="#history">History</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </nav>
+  <div class="container">
+    <div class="row">
+      <h1>Current Readings</h1>
+      <table class="table table-hover">
+        <tr>
+          <td><b>Sensor</b></td>
+          <td><b>Timestamp</b></td>          
+          <td><b>Total Records</b></td>
+          <td><b>Value</b></td>
+        </tr>        
+        <tr>
+          <td>Temperature</td>
+          <td>{{ temperatureTimestamp }}</td>          
+          <td>{{ temperatureRecords }}</td>
+          <td>{{ latestTemperature | number:0 }} °C</td>
+        </tr>
+        <tr>
+          <td>Humidity</td>
+          <td>{{ humidityTimestamp }}</td>
+          <td>{{ humidityRecords }}</td>
+          <td>{{ latestHumidity | number:0 }} %</td>
+        </tr>
+        <tr>
+          <td>Light</td>
+          <td>{{ lightLevelTimestamp }}</td>
+          <td>{{ lightRecords }}</td>
+          <td>{{ latestLightLevel | number:1 }} %</td>
+        </tr>
+        <tr>
+          <td>Soil Moisture</td>
+          <td>{{ soilMoistureTimestamp }}</td>
+          <td>{{ soilMoistureRecords }}</td>
+          <td>{{ latestSoilMoisture | number:1 }} %</td>
+        </tr>
+        <tr>
+          <td>Water Tank Level</td>
+          <td>{{ waterLevelTimestamp }}</td>
+          <td>{{ waterLevelRecords }}</td>
+          <td ng-style="customStyle.style">{{ latestWaterLevel | number:1 }} %</td>
+        </tr>
+        <tr>
+          <td>Water Pump Event -1</td>
+          <td>{{ pumpEventTimestamp1 }}</td>
+          <td>{{ waterRecords1 }}</td>
+          <td>{{ latestPumpEvent1 | number:0 }} ml</td>
+        </tr>
+        <tr>
+          <td>Water Pump Event -2</td>
+          <td>{{ pumpEventTimestamp2 }}</td>
+          <td>{{ waterRecords2 }}</td>
+          <td>{{ latestPumpEvent2 | number:0 }} ml</td>
+        </tr>
+        <tr>
+          <td>Water Pump Event -3</td>
+          <td>{{ pumpEventTimestamp3 }}</td>
+          <td>{{ waterRecords3 }}</td>
+          <td>{{ latestPumpEvent3 | number:0 }} ml</td>
+        </tr>
+      </table>
+      <div class="row cameraImage" id="camera">
+        <a ng-href="{{ images[currentImage].filename }}" target="_blank">
+          <img class="img-responsive" ng-src="{{ images[currentImage].filename }}" src="#" alt="GreenPiThumb camera image" />
+        </a>
+        <p>
+          {{ images[currentImage].timestamp | date: 'yyyy-MM-dd h:mm:ss a' }}<br />
+          ({{ currentImage + 1 }} of {{ images.length }})</p>
+        <button
+          class="btn btn-default"
+          ng-click="firstImage()"
+          ng-disabled="currentImage == 0">|&lt;</button>
+        <button
+          class="btn btn-default"
+          ng-click="previousImage()"
+          ng-disabled="currentImage == 0">&lt;</button>
+        <button
+          class="btn btn-default"
+          ng-click="nextImage()"
+          ng-disabled="currentImage == images.length - 1">&gt;</button>
+        <button
+          class="btn btn-default"
+          ng-click="lastImage()"
+          ng-disabled="currentImage == images.length - 1">&gt;|</button>
+      </div>
+    </div>
+    <div class="row" id="history">
+      <h1>History</h1>
+      <h3>Temperature</h3>
+      <line-graph chart-data="temperature" value-property="temperature" type="temperature"></line-graph>
+      <h3>Humidity</h3>
+      <line-graph chart-data="humidity" value-property="humidity" type="humidity"></line-graph>
+      <h3>Light</h3>
+      <line-graph chart-data="lightLevel" value-property="light" type="light"></line-graph>
+      <h3>Soil Moisture</h3>
+      <line-graph chart-data="soilMoisture" value-property="soil_moisture" type="soil_moisture"></line-graph>
+      <h3>Watering Events</h3>
+      <line-graph chart-data="waterPumped" value-property="water_pumped" type="water_pumped"></line-graph>      
+      <h3>Water Tank Level</h3>
+      <line-graph chart-data="waterLevel" value-property="water_level" type="water_level"></line-graph>
+    </div>
+    <div class="row" id="about">
+      <h1>About</h1>
+      <p>GreenPiThumb is the work of <a href="https://github.com/masterhui" target="_blank">@masterhui</a> and <a href="https://github.com/mtlynch" target="_blank">@mtlynch</a>. See the <a href="https://github.com/masterhui/GreenPiThumb" target="_blank">GreenPiThumb repo</a> on Github for more information.</p>
+      <small class="clearfix">{{ 'GreenPiThumb Frontend version %VERSION%' | interpolate }}</small>
+    </div>
+  </div> <!-- /container -->
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="app.js"></script>
+  <script src="services/d3.js"></script>
+  <script src="directives/lineGraphMobile.js"></script>
+  <script src="components/version/version.js"></script>
+  <script src="components/version/version-directive.js"></script>
+  <script src="components/version/interpolate-filter.js"></script>
+</body>
+</html>
