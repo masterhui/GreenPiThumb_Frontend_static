@@ -82,7 +82,7 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
         $scope.waterRecords3 = wateringEventHistory.length - 2;
     }
   });	
-  $http.get('/images_full_res.json').success(function(images) {
+  $http.get('/images_reduced_res.json').success(function(images) {
     $scope.images = [];
     images.forEach(function(image) {
       $scope.images.push({
@@ -100,7 +100,7 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
       return 0;
     });
     $scope.currentImage = $scope.images.length - 1;
-  });
+  });  
 
   $scope.firstImage = function() {
     $scope.currentImage = 0;

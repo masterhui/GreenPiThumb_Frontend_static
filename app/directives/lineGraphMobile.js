@@ -127,7 +127,7 @@ angular.module('greenPiThumbApp.directives')
             if(attrs.type === "water_pumped") 
               return 6.0;
             else
-              return 2.0;
+              return 1.0;
           }
           
           function getDotColor() {
