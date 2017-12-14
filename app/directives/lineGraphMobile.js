@@ -27,7 +27,7 @@ angular.module('greenPiThumbApp.directives')
         d3Service.d3().then(function(d3) {
             
           // Set the dimensions of the canvas / graph
-          var margin = {top: 30, right: 20, bottom: 50, left: 50};
+          var margin = {top: 30, right: 20, bottom: 58, left: 50};
           var width = 650 - margin.left - margin.right;
           var height = 450 - margin.top - margin.bottom;
 
@@ -44,9 +44,9 @@ angular.module('greenPiThumbApp.directives')
             .tickFormat(d3.timeFormat('%H'));
           var xAxisMinor = d3.axisBottom(x)
             .ticks(d3.timeDay.every(1))
-            .tickFormat(d3.timeFormat('%a, %x'))
+            .tickFormat(d3.timeFormat('%a, %e/%m/%Y'))
             .tickSize(-height)
-            .tickPadding(25);
+            .tickPadding(28);
           var yAxis = d3.axisLeft(y)
             .ticks(5);
 

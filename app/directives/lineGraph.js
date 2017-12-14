@@ -42,7 +42,7 @@ angular.module('greenPiThumbApp.directives')
             .tickFormat(d3.timeFormat('%H'));
           var xAxisMinor = d3.axisBottom(x)
             .ticks(d3.timeDay.every(1))
-            .tickFormat(d3.timeFormat('%a, %x'))
+            .tickFormat(d3.timeFormat('%a, %e/%m/%Y'))
             .tickSize(-height)
             .tickPadding(25);
           var yAxis = d3.axisLeft(y)
