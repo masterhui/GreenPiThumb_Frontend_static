@@ -11,7 +11,7 @@ var SOIL_MOISTURE_MAX = 100;
 var WATER_PUMPED_MIN = 0;
 var WATER_PUMPED_MAX = 4000;
 var WATER_LEVEL_MIN = 0;
-var WATER_LEVEL_MAX = 100;
+var WATER_LEVEL_MAX = 25;
 var DEFAULT_TIME_DOMAIN = 48;   // [hrs]
 
 angular.module('greenPiThumbApp.directives')
