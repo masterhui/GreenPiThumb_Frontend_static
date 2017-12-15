@@ -48,13 +48,13 @@
           <td>Temperature</td>
           <td>{{ temperatureTimestamp }}</td>          
           <td>{{ temperatureRecords }}</td>
-          <td>{{ latestTemperature | number:0 }} °C</td>
+          <td>{{ latestTemperature | number:1 }} °C</td>
         </tr>
         <tr>
           <td>Humidity</td>
           <td>{{ humidityTimestamp }}</td>
           <td>{{ humidityRecords }}</td>
-          <td>{{ latestHumidity | number:0 }} %</td>
+          <td>{{ latestHumidity | number:1 }} %</td>
         </tr>
         <tr>
           <td>Light</td>
