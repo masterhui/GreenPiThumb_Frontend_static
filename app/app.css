@@ -24,6 +24,10 @@ body {
   font: 12px Arial;
 }
 
+.tableMobile {
+  font-size: 18px;
+}
+
 path {
   stroke: steelblue;
   stroke-width: 2;

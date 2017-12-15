@@ -1,5 +1,7 @@
 'use strict';
 
+var WATER_LEVEL_LOW_THRESHOLD = 5.0;
+
 var greenPiThumbApp = angular.module('greenPiThumbApp', [
   'greenPiThumbApp.directives',
   'greenPiThumbApp.version'
@@ -24,7 +26,7 @@ function createDateFromString(dateTimeStr) {
 // Return: Date string with format "Do., 7.12.2017 15:10"
 function formatDate(date_str) {
 	var date = createDateFromString(date_str);
-	var date_options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' };
+	var date_options = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' };
   var date_formatted = date.toLocaleDateString("en-EN", date_options);
   var time = ('0'  + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
   var date_time = date_formatted + " " + time;    
@@ -44,7 +46,7 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
     $scope.latestWaterLevel = waterLevelHistory[waterLevelHistory.length - 1].water_level;
     $scope.waterLevelTimestamp = formatDate(waterLevelHistory[waterLevelHistory.length - 1].timestamp);
     $scope.customStyle = {};
-    $scope.customStyle.style = ($scope.latestWaterLevel <= 20) ? {"color":"red"} : {"color":"black"};    
+    $scope.customStyle.style = ($scope.latestWaterLevel <= WATER_LEVEL_LOW_THRESHOLD) ? {"color":"red"} : {"color":"black"};    
   });  
   $http.get('/humidityHistory.json').success(function(humidityHistory) {
     $scope.humidity = humidityHistory;

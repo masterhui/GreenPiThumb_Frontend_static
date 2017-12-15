@@ -123,7 +123,7 @@ angular.module('greenPiThumbApp.directives')
             else if (attrs.type === "water_pumped")
               label = "Pump Event [ml]";
             else if (attrs.type === "water_level")
-              label = "Tank Level [%]";                                                
+              label = "Tank Level [l]";                                                
 
             return label;
           }

@@ -55,6 +55,12 @@ angular.module('greenPiThumbApp.directives')
             //~ .curve(d3.curveBasis)
             .x(function(d) { return x(d.timestamp); })
             .y(function(d) { return y(d.value); });
+            
+          var area = d3.area()
+              .curve(d3.curveMonotoneX)
+              .x(function(d) { return x(d.timestamp); })
+              .y0(height)
+              .y1(function(d) { return y(d.value); });              
 
           // Define the div for the tooltip.
           var div = d3.select('body').append('div')
@@ -118,7 +124,7 @@ angular.module('greenPiThumbApp.directives')
             else if (attrs.type === "water_pumped")
               label = "Pump Event [ml]";
             else if (attrs.type === "water_level")
-              label = "Tank Level [%]";                                                
+              label = "Tank Level [l]";                                                
 
             return label;
           }
@@ -137,6 +143,20 @@ angular.module('greenPiThumbApp.directives')
               return "black";
           }          
 
+         function getVizStr() {
+            if(attrs.type === "water_level") 
+              return "area";
+            else
+              return "line";
+          }  
+          
+         function getVizObj(data) {
+            if(attrs.type === "water_level") 
+              return area(data);
+            else
+              return valueline(data);
+          } 
+          
           var updateGraph = function(data, type) { 
             data.forEach(function(d) {
               d.timestamp = parseTimestamp(d.timestamp);
@@ -168,8 +188,8 @@ angular.module('greenPiThumbApp.directives')
             // Add the valueline path.
             svg.append('path')
               //~ .style("stroke", "red")
-              .attr('class', 'line')
-              .attr('d', valueline(data));
+              .attr('class', getVizStr())
+              .attr('d', getVizObj(data));   
               
             // Add the scatterplot for tooltips.
             svg.selectAll('dot')
