@@ -12,7 +12,7 @@ var WATER_PUMPED_MIN = 0;
 var WATER_PUMPED_MAX = 4000;
 var WATER_LEVEL_MIN = 0;
 var WATER_LEVEL_MAX = 25;
-var DEFAULT_TIME_DOMAIN = 5;   // [hrs]
+var DEFAULT_TIME_DOMAIN = 1;   // [d]
 var FONT_SIZE = 14
 var FONT_SIZE_LABEL = 16
 
@@ -44,7 +44,7 @@ angular.module('greenPiThumbApp.directives')
           var y = d3.scaleLinear().range([height, 0]);
 
           // Define the axes
-          function xTickMajorFunc() { return d3.timeHour.every(2); }
+          function xTickMajorFunc(freqency) { return d3.timeHour.every(freqency); }
           var xAxisMajor = d3.axisBottom(x)
             .ticks(xTickMajorFunc())
             .tickFormat(d3.timeFormat('%H'));
@@ -173,9 +173,11 @@ angular.module('greenPiThumbApp.directives')
               .attr('transform',
                     'translate(' + margin.left + ',' + margin.top + ')');          
           
-          var updateGraph = function(data) { 
+          var updateGraph = function(data, parseTimestampFlag) { 
             data.forEach(function(d) {
-              d.timestamp = parseTimestamp(d.timestamp);
+              if(parseTimestampFlag) {
+                d.timestamp = parseTimestamp(d.timestamp);
+              }
               d.value = scope.$eval(attrs.valueProperty, d);
             });
                       
@@ -183,10 +185,10 @@ angular.module('greenPiThumbApp.directives')
             //~ data = data.filter(function(d) {
               //~ return d.timestamp > timeDomainStart
             //~ })                       
-
+      
             // Scale the range of the data            
             //~ x.domain(d3.extent(data, function(d) { return d.timestamp; }));                
-            var timeDomainStart = new Date(d3.timeDay.offset(new Date(), 0).setHours(-scope.time_domain)); 
+            var timeDomainStart = new Date(d3.timeDay.offset(new Date(), -scope.time_domain)); 
             var timeDomainEnd = new Date();
             console.log("timeDomainStart: " + timeDomainStart);
             console.log("timeDomainEnd: " + timeDomainEnd);                    
@@ -197,23 +199,12 @@ angular.module('greenPiThumbApp.directives')
             ]);
 
             // Add the valueline path.
-            svg.append('path')
+            var graph = svg.append('path')
               //~ .style("stroke", "red")
               .attr('class', getVizStr())
               .attr('d', getVizObj(data));   
-              
-            // Add the scatterplot for tooltips.
-            //~ var circle = svg.selectAll("dot")
-              //~ .data(data);
-
-            //~ circle.exit().remove();
-
-            //~ circle.enter().append("circle")
-                //~ .attr("r", 2.5)
-              //~ .merge(circle)
-                //~ .attr("cx", function(d) { return x(d.timestamp); })
-                //~ .attr("cy", function(d) { return y(d.value); });            
-            
+                 
+            // Add the scatterplot
             svg.selectAll('dot')
               .data(data)
             .enter().append('circle')
@@ -289,14 +280,14 @@ angular.module('greenPiThumbApp.directives')
           scope.minus24h = function(){ minus24h(); };
           function minus24h() {            
             scope.time_domain = scope.time_domain + DEFAULT_TIME_DOMAIN;
-            console.log("svg.selectAll(*).remove()");
+            console.log("New time domain: " + scope.time_domain)
             svg.selectAll("*").remove();
-            updateGraph(scope.data);
+            updateGraph(scope.data, false);
           }
           
           scope.$watch('data', function(newValue) {
             if (!newValue) { return; }            
-            updateGraph(newValue);
+            updateGraph(newValue, true);
           });
         });
       }
