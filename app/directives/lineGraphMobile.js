@@ -44,15 +44,26 @@ angular.module('greenPiThumbApp.directives')
           var y = d3.scaleLinear().range([height, 0]);
 
           // Define the axes
-          function xTickMajorFunc(freqency) { return d3.timeHour.every(freqency); }
-          var xAxisMajor = d3.axisBottom(x)
-            .ticks(xTickMajorFunc())
-            .tickFormat(d3.timeFormat('%H'));
-          var xAxisMinor = d3.axisBottom(x)
-            .ticks(d3.timeDay.every(1))
-            .tickFormat(d3.timeFormat('%a, %e/%m/%Y'))
-            .tickSize(-height)
-            .tickPadding(28);
+          function xTickMajorFunc(tickFreq) {
+            return d3.timeHour.every(tickFreq);
+          }
+          
+          function xAxisMajor(tickFreq) {
+            var retVal = d3.axisBottom(x)
+              .ticks(xTickMajorFunc(tickFreq))
+              .tickFormat(d3.timeFormat('%H'));
+            return retVal;
+          }
+          
+          function xAxisMinor(tickFreq) {
+            var retVal = d3.axisBottom(x)
+              .ticks(d3.timeDay.every(tickFreq))
+              .tickFormat(d3.timeFormat('%a, %e/%m/%Y'))
+              .tickSize(-height)
+              .tickPadding(28);
+            return retVal;
+          }
+          
           var yAxis = d3.axisLeft(y)
             .ticks(5);
 
@@ -190,8 +201,8 @@ angular.module('greenPiThumbApp.directives')
             //~ x.domain(d3.extent(data, function(d) { return d.timestamp; }));                
             var timeDomainStart = new Date(d3.timeDay.offset(new Date(), -scope.time_domain)); 
             var timeDomainEnd = new Date();
-            console.log("timeDomainStart: " + timeDomainStart);
-            console.log("timeDomainEnd: " + timeDomainEnd);                    
+            //~ console.log("timeDomainStart: " + timeDomainStart);
+            //~ console.log("timeDomainEnd: " + timeDomainEnd);                    
             x.domain([timeDomainStart, timeDomainEnd])            
             y.domain([
               d3.min(data, function(d) { return getMinRange(); }),
@@ -199,10 +210,17 @@ angular.module('greenPiThumbApp.directives')
             ]);
 
             // Add the valueline path.
-            var graph = svg.append('path')
+            svg.append('path')
               //~ .style("stroke", "red")
+              .attr("clip-path", "url(#clip)")
               .attr('class', getVizStr())
               .attr('d', getVizObj(data));   
+              
+            svg.append("defs").append("clipPath")
+                .attr("id", "clip")
+              .append("rect")
+                .attr("width", width)
+                .attr("height", height);                
                  
             // Add the scatterplot
             svg.selectAll('dot')
@@ -212,6 +230,7 @@ angular.module('greenPiThumbApp.directives')
               .attr('fill', getDotColor() )
               .attr('cx', function(d) { return x(d.timestamp); })
               .attr('cy', function(d) { return y(d.value); })
+              .attr("clip-path", "url(#clip)")
               .on('mouseover', function(d) {
                     div.transition()
                       .duration(200)
@@ -236,16 +255,16 @@ angular.module('greenPiThumbApp.directives')
               .attr('transform', 'translate(0,' + height + ')')
               .attr('axis', 'font: 14px sans-serif')
               .style("font-size", FONT_SIZE)
-              .call(xAxisMajor);
+              .call(xAxisMajor(scope.time_domain));
             
             // Add the minor x axis  
             svg.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
               .style("font-size", FONT_SIZE)
-              .call(xAxisMinor)              
+              .call(xAxisMinor(scope.time_domain))              
               .selectAll(".tick")
-              .data(x.ticks(xTickMajorFunc()), function(d) { return d; })
+              .data(x.ticks(xTickMajorFunc((scope.time_domain))), function(d) { return d; })
               .exit()
               .classed("minor", true);              
             
