@@ -23,6 +23,11 @@ angular.module('greenPiThumbApp.directives')
       replace: false,
       scope: {data: '=chartData', type: '@'},
       //template:'<div class="type"><h2>type is {{type}}</h2></div>',
+      
+      template: '<div class="form">' +
+                '<button ng-click="minus24h()">-24h</button>' +
+                '</div>',
+      
       link: function(scope, element, attrs) {
         d3Service.d3().then(function(d3) {
             
@@ -32,7 +37,8 @@ angular.module('greenPiThumbApp.directives')
           var height = 450 - margin.top - margin.bottom;
 
           var parseTimestamp = d3.utcParse('%Y%m%dT%H%M%Z');
-
+          scope.time_domain = DEFAULT_TIME_DOMAIN;
+          
           // Set the ranges
           var x = d3.scaleTime().range([0, width]);
           var y = d3.scaleLinear().range([height, 0]);
@@ -56,6 +62,7 @@ angular.module('greenPiThumbApp.directives')
             .x(function(d) { return x(d.timestamp); })
             .y(function(d) { return y(d.value); });
             
+          // Define the area
           var area = d3.area()
               .curve(d3.curveMonotoneX)
               .x(function(d) { return x(d.timestamp); })
@@ -150,36 +157,40 @@ angular.module('greenPiThumbApp.directives')
               return "line";
           }  
           
-         function getVizObj(data) {
+         function getVizObj(data) {               
             if(attrs.type === "water_level") 
               return area(data);
             else
               return valueline(data);
           } 
           
-          var updateGraph = function(data, type) { 
+          // Add the svg canvas
+          var svg = d3.select(element[0])
+            .append('svg')
+              .attr('width', width + margin.left + margin.right)
+              .attr('height', height + margin.top + margin.bottom)
+            .append('g')
+              .attr('transform',
+                    'translate(' + margin.left + ',' + margin.top + ')');          
+          
+          var updateGraph = function(data) { 
             data.forEach(function(d) {
               d.timestamp = parseTimestamp(d.timestamp);
               d.value = scope.$eval(attrs.valueProperty, d);
             });
-            
+                      
             // Filter the date range
-            var timeDomainStart = new Date(d3.timeDay.offset(new Date(), 0).setHours(-DEFAULT_TIME_DOMAIN)); 
-            data = data.filter(function(d) {
-              return d.timestamp > timeDomainStart
-            })            
-
-            // Add the svg canvas
-            var svg = d3.select(element[0])
-              .append('svg')
-                .attr('width', width + margin.left + margin.right)
-                .attr('height', height + margin.top + margin.bottom)
-              .append('g')
-                .attr('transform',
-                      'translate(' + margin.left + ',' + margin.top + ')');
+            //~ data = data.filter(function(d) {
+              //~ return d.timestamp > timeDomainStart
+            //~ })                       
 
             // Scale the range of the data            
-            x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+            //~ x.domain(d3.extent(data, function(d) { return d.timestamp; }));                
+            var timeDomainStart = new Date(d3.timeDay.offset(new Date(), 0).setHours(-scope.time_domain)); 
+            var timeDomainEnd = new Date();
+            console.log("timeDomainStart: " + timeDomainStart);
+            console.log("timeDomainEnd: " + timeDomainEnd);                    
+            x.domain([timeDomainStart, timeDomainEnd])            
             y.domain([
               d3.min(data, function(d) { return getMinRange(); }),
               d3.max(data, function(d) { return getMaxRange(); })            
@@ -192,6 +203,17 @@ angular.module('greenPiThumbApp.directives')
               .attr('d', getVizObj(data));   
               
             // Add the scatterplot for tooltips.
+            //~ var circle = svg.selectAll("dot")
+              //~ .data(data);
+
+            //~ circle.exit().remove();
+
+            //~ circle.enter().append("circle")
+                //~ .attr("r", 2.5)
+              //~ .merge(circle)
+                //~ .attr("cx", function(d) { return x(d.timestamp); })
+                //~ .attr("cy", function(d) { return y(d.value); });            
+            
             svg.selectAll('dot')
               .data(data)
             .enter().append('circle')
@@ -261,9 +283,19 @@ angular.module('greenPiThumbApp.directives')
               .style("font-weight", "bold")
               .style("font-size", FONT_SIZE_LABEL)
               .text(getYAxisLabel());              
+              
           };
+          
+          scope.minus24h = function(){ minus24h(); };
+          function minus24h() {            
+            scope.time_domain = scope.time_domain + DEFAULT_TIME_DOMAIN;
+            console.log("svg.selectAll(*).remove()");
+            svg.selectAll("*").remove();
+            updateGraph(scope.data);
+          }
+          
           scope.$watch('data', function(newValue) {
-            if (!newValue) { return; }
+            if (!newValue) { return; }            
             updateGraph(newValue);
           });
         });
