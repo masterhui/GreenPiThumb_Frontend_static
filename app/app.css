@@ -67,3 +67,8 @@ div.tooltip {
 div.cameraImage {
   max-width: 1024px;
 }
+
+.myBtn{
+    width:60px;
+    height:30px;
+}

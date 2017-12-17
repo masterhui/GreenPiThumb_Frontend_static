@@ -12,7 +12,7 @@ var WATER_PUMPED_MIN = 0;
 var WATER_PUMPED_MAX = 4000;
 var WATER_LEVEL_MIN = 0;
 var WATER_LEVEL_MAX = 25;
-var DEFAULT_TIME_DOMAIN = 1;   // [d]
+var DEFAULT_INCREMENT = 1;   // [d]
 var FONT_SIZE = 14
 var FONT_SIZE_LABEL = 16
 
@@ -25,7 +25,10 @@ angular.module('greenPiThumbApp.directives')
       //template:'<div class="type"><h2>type is {{type}}</h2></div>',
       
       template: '<div class="form">' +
-                '<button ng-click="minus24h()">-24h</button>' +
+                '<button class="myBtn" ng-click="minus24h()">-24h</button>&emsp;' +
+                '<button class="myBtn" ng-click="reset()">Reset</button>&emsp;' +
+                '<button class="myBtn" ng-click="plus24h()">+24h</button>&emsp;&emsp;&emsp;&emsp;' +
+                '<button class="myBtn" ng-click="showAll()">All</button>' +
                 '</div>',
       
       link: function(scope, element, attrs) {
@@ -33,11 +36,11 @@ angular.module('greenPiThumbApp.directives')
             
           // Set the dimensions of the canvas / graph
           var margin = {top: 30, right: 20, bottom: 58, left: 50};
-          var width = 650 - margin.left - margin.right;
-          var height = 450 - margin.top - margin.bottom;
+          var width = 600 - margin.left - margin.right;
+          var height = 300 - margin.top - margin.bottom;
 
           var parseTimestamp = d3.utcParse('%Y%m%dT%H%M%Z');
-          scope.time_domain = DEFAULT_TIME_DOMAIN;
+          scope.time_domain = DEFAULT_INCREMENT;
           
           // Set the ranges
           var x = d3.scaleTime().range([0, width]);
@@ -55,12 +58,22 @@ angular.module('greenPiThumbApp.directives')
             return retVal;
           }
           
-          function xAxisMinor(tickFreq) {
-            var retVal = d3.axisBottom(x)
-              .ticks(d3.timeDay.every(tickFreq))
-              .tickFormat(d3.timeFormat('%a, %e/%m/%Y'))
-              .tickSize(-height)
-              .tickPadding(28);
+          function xAxisMinor(tickFreq, showFullTimeRange) {
+            var retVal = []
+            if(showFullTimeRange) {
+              retVal = d3.axisBottom(x)
+                .ticks(2)
+                .tickFormat(d3.timeFormat('%a, %e/%m/%Y'))
+                .tickSize(-height)
+                .tickPadding(28);
+            }
+            else {
+              retVal = d3.axisBottom(x)
+                .ticks(d3.timeDay.every(tickFreq))
+                .tickFormat(d3.timeFormat('%a, %e/%m/%Y'))
+                .tickSize(-height)
+                .tickPadding(28);
+            }
             return retVal;
           }
           
@@ -184,7 +197,7 @@ angular.module('greenPiThumbApp.directives')
               .attr('transform',
                     'translate(' + margin.left + ',' + margin.top + ')');          
           
-          var updateGraph = function(data, parseTimestampFlag) { 
+          var updateGraph = function(data, parseTimestampFlag, showFullTimeRange) { 
             data.forEach(function(d) {
               if(parseTimestampFlag) {
                 d.timestamp = parseTimestamp(d.timestamp);
@@ -197,13 +210,16 @@ angular.module('greenPiThumbApp.directives')
               //~ return d.timestamp > timeDomainStart
             //~ })                       
       
-            // Scale the range of the data            
-            //~ x.domain(d3.extent(data, function(d) { return d.timestamp; }));                
-            var timeDomainStart = new Date(d3.timeDay.offset(new Date(), -scope.time_domain)); 
-            var timeDomainEnd = new Date();
-            //~ console.log("timeDomainStart: " + timeDomainStart);
-            //~ console.log("timeDomainEnd: " + timeDomainEnd);                    
-            x.domain([timeDomainStart, timeDomainEnd])            
+            // Scale the range of the data  
+            if(showFullTimeRange) {
+              x.domain(d3.extent(data, function(d) { return d.timestamp; }));                
+            }
+            else {
+              var timeDomainStart = new Date(d3.timeDay.offset(new Date(), -scope.time_domain)); 
+              var timeDomainEnd = new Date();
+              x.domain([timeDomainStart, timeDomainEnd])                          
+            }
+            
             y.domain([
               d3.min(data, function(d) { return getMinRange(); }),
               d3.max(data, function(d) { return getMaxRange(); })            
@@ -223,31 +239,33 @@ angular.module('greenPiThumbApp.directives')
                 .attr("height", height);                
                  
             // Add the scatterplot
-            svg.selectAll('dot')
-              .data(data)
-            .enter().append('circle')
-              .attr('r', getDotRadius() )
-              .attr('fill', getDotColor() )
-              .attr('cx', function(d) { return x(d.timestamp); })
-              .attr('cy', function(d) { return y(d.value); })
-              .attr("clip-path", "url(#clip)")
-              .on('mouseover', function(d) {
+            if(attrs.type === "water_pumped") {
+              svg.selectAll('dot')
+                .data(data)
+              .enter().append('circle')
+                .attr('r', getDotRadius() )
+                .attr('fill', getDotColor() )
+                .attr('cx', function(d) { return x(d.timestamp); })
+                .attr('cy', function(d) { return y(d.value); })
+                .attr("clip-path", "url(#clip)")
+                .on('mouseover', function(d) {
+                      div.transition()
+                        .duration(200)
+                        .style('opacity', 0.9);
+                      div.html(
+                        formatValue(d.value) + '<br />' +
+                        formatTime(d.timestamp) + '<br />' +
+                        formatDate(d.timestamp))
+                        .style('left', (d3.event.pageX + 3) + 'px')
+                        .style('top', (d3.event.pageY - 52) + 'px');
+                    })
+                  .on('mouseout', function(d) {
                     div.transition()
-                      .duration(200)
-                      .style('opacity', 0.9);
-                    div.html(
-                      formatValue(d.value) + '<br />' +
-                      formatTime(d.timestamp) + '<br />' +
-                      formatDate(d.timestamp))
-                      .style('left', (d3.event.pageX + 3) + 'px')
-                      .style('top', (d3.event.pageY - 52) + 'px');
-                  })
-                .on('mouseout', function(d) {
-                  div.transition()
-                    .duration(500)
-                    .style('opacity', 0);
-                });
-
+                      .duration(500)
+                      .style('opacity', 0);
+                  });
+            }
+            
             // We use major and minor ticks according to d3v4, seen here: https://stackoverflow.com/questions/21643787/d3-js-alternative-to-axis-ticksubdivide
             // Add the major x axis
             svg.append('g')
@@ -262,7 +280,7 @@ angular.module('greenPiThumbApp.directives')
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
               .style("font-size", FONT_SIZE)
-              .call(xAxisMinor(scope.time_domain))              
+              .call(xAxisMinor(scope.time_domain, showFullTimeRange))              
               .selectAll(".tick")
               .data(x.ticks(xTickMajorFunc((scope.time_domain))), function(d) { return d; })
               .exit()
@@ -296,17 +314,33 @@ angular.module('greenPiThumbApp.directives')
               
           };
           
-          scope.minus24h = function(){ minus24h(); };
-          function minus24h() {            
-            scope.time_domain = scope.time_domain + DEFAULT_TIME_DOMAIN;
-            console.log("New time domain: " + scope.time_domain)
+          scope.minus24h = function() {      
+            scope.time_domain = scope.time_domain + DEFAULT_INCREMENT;
             svg.selectAll("*").remove();
-            updateGraph(scope.data, false);
-          }
+            updateGraph(scope.data, false, false);
+          };
+          
+          scope.reset = function() {      
+            scope.time_domain = 1;
+            svg.selectAll("*").remove();
+            updateGraph(scope.data, false, false);
+          };
+          
+          scope.plus24h = function() {      
+            scope.time_domain = scope.time_domain - DEFAULT_INCREMENT;
+            svg.selectAll("*").remove();
+            updateGraph(scope.data, false, false);
+          };
+          
+          scope.showAll = function() {      
+            scope.time_domain = scope.time_domain - DEFAULT_INCREMENT;
+            svg.selectAll("*").remove();
+            updateGraph(scope.data, false, true);
+          };          
           
           scope.$watch('data', function(newValue) {
             if (!newValue) { return; }            
-            updateGraph(newValue, true);
+            updateGraph(newValue, true, false);
           });
         });
       }
