@@ -35,7 +35,7 @@ angular.module('greenPiThumbApp.directives')
         d3Service.d3().then(function(d3) {
             
           // Set the dimensions of the canvas / graph
-          var margin = {top: 30, right: 20, bottom: 58, left: 50};
+          var margin = {top: 30, right: 20, bottom: 60, left: 50};
           var width = 600 - margin.left - margin.right;
           var height = 300 - margin.top - margin.bottom;
 
@@ -47,42 +47,38 @@ angular.module('greenPiThumbApp.directives')
           var y = d3.scaleLinear().range([height, 0]);
 
           // Define the axes
-          function xHourTickFunc(tickFreq) {            
-            return d3.timeHour.every(tickFreq);
-          }
-          
-          function xAxisHourTicks(tickFreq) {
-            var retVal = d3.axisBottom(x)
-              .ticks(xHourTickFunc(tickFreq))
-              .tickFormat(d3.timeFormat('%H'));
-              
-            return retVal;
-          }
-          
-          function xAxisDayTicks(tickFreq, showFullTimeRange) {
-            var retVal = d3.axisBottom(x)
-                  .ticks(d3.timeDay.every(1))
-                  .tickSize(-height)
-                  
-            return retVal;
-          }
-          
-          function xAxisDayLabels(tickFreq, showFullTimeRange) {
-            var retVal = []
-            if(showFullTimeRange) {
-              retVal = d3.axisBottom(x)
-                .ticks(2)
-                .tickFormat(d3.timeFormat('%a, %e/%m/%Y'))
-                .tickPadding(28);
+          function xHourTickFunc(tickFreq, showAll) {            
+            var retVal = [];
+            if(showAll) {
+              retVal = d3.timeDay.every(1);
             }
             else {
-              retVal = d3.axisBottom(x)
-                .ticks(d3.timeDay.every(tickFreq))
-                .tickFormat(d3.timeFormat('%a, %e/%m/%Y'))
-                .tickPadding(28);
+              if(tickFreq <= 1)
+                retVal = d3.timeHour.every(1);
+              else
+                retVal = d3.timeHour.every(6);
             }
             
             return retVal;
+          }
+          
+          function xAxisHourTicks(tickFreq, showAll) {
+            return d3.axisBottom(x)
+              .ticks(xHourTickFunc(tickFreq, showAll))
+              .tickFormat(d3.timeFormat('%H'));
+          }
+          
+          function xAxisDayTicks(tickFreq, showAll) {
+            return d3.axisBottom(x)
+                  .ticks(d3.timeDay.every(1))
+                  .tickSize(-height)
+          }
+          
+          function xAxisDayLabels() {
+            return d3.axisBottom(x)
+                .ticks(2)
+                .tickFormat(d3.timeFormat('%a, %e/%m/%Y'))
+                .tickPadding(24);
           }          
           
           var yAxis = d3.axisLeft(y)
@@ -205,7 +201,7 @@ angular.module('greenPiThumbApp.directives')
               .attr('transform',
                     'translate(' + margin.left + ',' + margin.top + ')');          
           
-          var updateGraph = function(data, parseTimestampFlag, showFullTimeRange) { 
+          var updateGraph = function(data, parseTimestampFlag, showAll) { 
             data.forEach(function(d) {
               if(parseTimestampFlag) {
                 d.timestamp = parseTimestamp(d.timestamp);
@@ -219,7 +215,7 @@ angular.module('greenPiThumbApp.directives')
             //~ })                       
       
             // Scale the range of the data  
-            if(showFullTimeRange) {
+            if(showAll) {
               x.domain(d3.extent(data, function(d) { return d.timestamp; }));                
             }
             else {
@@ -281,16 +277,16 @@ angular.module('greenPiThumbApp.directives')
               .attr('transform', 'translate(0,' + height + ')')
               .attr('axis', 'font: 14px sans-serif')
               .style("font-size", FONT_SIZE)
-              .call(xAxisHourTicks(scope.time_domain));
+              .call(xAxisHourTicks(scope.time_domain, showAll));
             
             // Add x axis day labels
             svg.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
               .style("font-size", FONT_SIZE)
-              .call(xAxisDayLabels(scope.time_domain, showFullTimeRange))              
+              .call(xAxisDayLabels())              
               .selectAll(".tick")
-              .data(x.ticks(xHourTickFunc((scope.time_domain))), function(d) { return d; })
+              .data(x.ticks(xHourTickFunc(scope.time_domain, showAll)), function(d) { return d; })
               .exit()
               .classed("minor", true);              
               
@@ -299,9 +295,9 @@ angular.module('greenPiThumbApp.directives')
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
               .style("font-size", 0)
-              .call(xAxisDayTicks(scope.time_domain, showFullTimeRange))              
+              .call(xAxisDayTicks(scope.time_domain, showAll))              
               .selectAll(".tick")
-              .data(x.ticks(xHourTickFunc((scope.time_domain))), function(d) { return d; })
+              .data(x.ticks(xHourTickFunc(scope.time_domain, showAll)), function(d) { return d; })
               .exit()
               .classed("minor", true);                            
             

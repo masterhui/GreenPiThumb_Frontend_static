@@ -22,6 +22,7 @@
 
 body {
   font: 12px Arial;
+  margin-left:10px;
 }
 
 .tableMobile {
@@ -66,6 +67,7 @@ div.tooltip {
 
 div.cameraImage {
   max-width: 1024px;
+  margin-left:10px;
 }
 
 .myBtn{
