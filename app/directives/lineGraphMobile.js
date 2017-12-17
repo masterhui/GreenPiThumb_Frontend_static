@@ -47,35 +47,43 @@ angular.module('greenPiThumbApp.directives')
           var y = d3.scaleLinear().range([height, 0]);
 
           // Define the axes
-          function xTickMajorFunc(tickFreq) {
+          function xHourTickFunc(tickFreq) {            
             return d3.timeHour.every(tickFreq);
           }
           
-          function xAxisMajor(tickFreq) {
+          function xAxisHourTicks(tickFreq) {
             var retVal = d3.axisBottom(x)
-              .ticks(xTickMajorFunc(tickFreq))
+              .ticks(xHourTickFunc(tickFreq))
               .tickFormat(d3.timeFormat('%H'));
+              
             return retVal;
           }
           
-          function xAxisMinor(tickFreq, showFullTimeRange) {
+          function xAxisDayTicks(tickFreq, showFullTimeRange) {
+            var retVal = d3.axisBottom(x)
+                  .ticks(d3.timeDay.every(1))
+                  .tickSize(-height)
+                  
+            return retVal;
+          }
+          
+          function xAxisDayLabels(tickFreq, showFullTimeRange) {
             var retVal = []
             if(showFullTimeRange) {
               retVal = d3.axisBottom(x)
                 .ticks(2)
                 .tickFormat(d3.timeFormat('%a, %e/%m/%Y'))
-                .tickSize(-height)
                 .tickPadding(28);
             }
             else {
               retVal = d3.axisBottom(x)
                 .ticks(d3.timeDay.every(tickFreq))
                 .tickFormat(d3.timeFormat('%a, %e/%m/%Y'))
-                .tickSize(-height)
                 .tickPadding(28);
             }
+            
             return retVal;
-          }
+          }          
           
           var yAxis = d3.axisLeft(y)
             .ticks(5);
@@ -267,24 +275,35 @@ angular.module('greenPiThumbApp.directives')
             }
             
             // We use major and minor ticks according to d3v4, seen here: https://stackoverflow.com/questions/21643787/d3-js-alternative-to-axis-ticksubdivide
-            // Add the major x axis
+            // Add the x axis hour ticks and labels
             svg.append('g')
               .attr('class', 'x axis')
               .attr('transform', 'translate(0,' + height + ')')
               .attr('axis', 'font: 14px sans-serif')
               .style("font-size", FONT_SIZE)
-              .call(xAxisMajor(scope.time_domain));
+              .call(xAxisHourTicks(scope.time_domain));
             
-            // Add the minor x axis  
+            // Add x axis day labels
             svg.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
               .style("font-size", FONT_SIZE)
-              .call(xAxisMinor(scope.time_domain, showFullTimeRange))              
+              .call(xAxisDayLabels(scope.time_domain, showFullTimeRange))              
               .selectAll(".tick")
-              .data(x.ticks(xTickMajorFunc((scope.time_domain))), function(d) { return d; })
+              .data(x.ticks(xHourTickFunc((scope.time_domain))), function(d) { return d; })
               .exit()
               .classed("minor", true);              
+              
+            // Add x axis day labels
+            svg.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .style("font-size", 0)
+              .call(xAxisDayTicks(scope.time_domain, showFullTimeRange))              
+              .selectAll(".tick")
+              .data(x.ticks(xHourTickFunc((scope.time_domain))), function(d) { return d; })
+              .exit()
+              .classed("minor", true);                            
             
             // Add text label for the x axis
             svg.append("text") 

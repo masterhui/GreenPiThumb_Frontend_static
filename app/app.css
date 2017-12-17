@@ -69,6 +69,8 @@ div.cameraImage {
 }
 
 .myBtn{
-    width:60px;
-    height:30px;
+    width :60px;
+    height: 30px;
+    border-radius: 0;
+    -webkit-appearance: none;
 }
