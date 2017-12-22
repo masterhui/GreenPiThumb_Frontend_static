@@ -50,7 +50,7 @@ angular.module('greenPiThumbApp.directives')
 
           // Define the area
           var area = d3.area()
-              .curve(d3.curveMonotoneX)
+              //~ .curve(d3.curveBasis)
               .x(function(d) { return x(d.timestamp); })
               .y0(height)
               .y1(function(d) { return y(d.value); });   

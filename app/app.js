@@ -45,8 +45,8 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
     $scope.waterLevelRecords = waterLevelHistory.length;
     $scope.latestWaterLevel = waterLevelHistory[waterLevelHistory.length - 1].water_level;
     $scope.waterLevelTimestamp = formatDate(waterLevelHistory[waterLevelHistory.length - 1].timestamp);
-    $scope.customStyle = {};
-    $scope.customStyle.style = ($scope.latestWaterLevel <= WATER_LEVEL_LOW_THRESHOLD) ? {"color":"red"} : {"color":"black"};    
+    $scope.customStyleWaterLevelLow = {};
+    $scope.customStyleWaterLevelLow.style = ($scope.latestWaterLevel <= WATER_LEVEL_LOW_THRESHOLD) ? {"color":"red"} : {"color":"black"};    
   });  
   $http.get('/humidityHistory.json').success(function(humidityHistory) {
     $scope.humidity = humidityHistory;
@@ -64,7 +64,10 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
     $scope.soilMoisture = moistureHistory;
     $scope.soilMoistureRecords = $scope.soilMoisture.length;    
     $scope.latestSoilMoisture = $scope.soilMoisture[$scope.soilMoisture.length - 1].soil_moisture;
+    $scope.latestWaterPresent = $scope.soilMoisture[$scope.soilMoisture.length - 1].water_present;
     $scope.soilMoistureTimestamp = formatDate($scope.soilMoisture[$scope.soilMoisture.length - 1].timestamp);	  
+    $scope.customStyleWaterPresent = {};
+    $scope.customStyleWaterPresent.style = $scope.latestWaterPresent ? {"color":"blue"} : {"color":"black"};
   });
   $http.get('/wateringEventHistory.json').success(function(wateringEventHistory) {
     $scope.waterPumped = wateringEventHistory;    
