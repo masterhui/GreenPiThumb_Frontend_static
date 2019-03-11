@@ -65,7 +65,6 @@ greenPiThumbApp.controller('DashboardCtrl', function($scope, $http) {
     $scope.soilMoistureRecords = $scope.soilMoisture.length;    
     $scope.latestSoilMoisture = $scope.soilMoisture[$scope.soilMoisture.length - 1].soil_moisture;
     var waterPresent = $scope.soilMoisture[$scope.soilMoisture.length - 1].water_present;
-    console.log("latestWaterPresent = " + waterPresent);
     $scope.soilMoistureTimestamp = formatDate($scope.soilMoisture[$scope.soilMoisture.length - 1].timestamp);	  
     $scope.customStyleWaterPresent = {};
     $scope.customStyleWaterPresent.style = waterPresent ? {"color":"blue", "font-weight":"bold"} : {"color":"black"};
