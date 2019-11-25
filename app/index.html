@@ -116,6 +116,13 @@
           ng-click="lastImage()"
           ng-disabled="currentImage == images.length - 1">&gt;|</button>
       </div>
+      <div class="row">
+        <h1>Timelapse</h1>
+        <video controls loop autoplay>
+          <source src="images/timelapse.ogg" type="video/ogg">
+          Your browser does not support the video tag.
+        </video>
+      </div>  
     </div>
     <div class="row" id="history">
       <h1>History</h1>
